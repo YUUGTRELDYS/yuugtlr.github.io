@@ -21,11 +21,108 @@ local colors = {
 	textDim = Color3.fromRGB(200, 200, 220)
 }
 
-local function createTween(object, properties, duration, easingStyle, easingDirection)
-	return TweenService:Create(object, 
-		TweenInfo.new(duration or 0.2, easingStyle or Enum.EasingStyle.Quad, easingDirection or Enum.EasingDirection.Out), 
-		properties
-	)
+local libraryLoaded = false
+
+local function showWatermark()
+	if libraryLoaded then return end
+	libraryLoaded = true
+	
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "YUUGTRL_Watermark"
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.DisplayOrder = 9999
+	screenGui.ResetOnSpawn = false
+	screenGui.Parent = player:WaitForChild("PlayerGui")
+	
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(0, 200, 0, 50)
+	frame.Position = UDim2.new(1, -210, 1, -60)
+	frame.BackgroundColor3 = colors.background
+	frame.BackgroundTransparency = 0.1
+	frame.BorderSizePixel = 0
+	frame.Parent = screenGui
+	
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, colors.accent),
+		ColorSequenceKeypoint.new(0.5, colors.info),
+		ColorSequenceKeypoint.new(1, colors.accent)
+	})
+	gradient.Rotation = 45
+	gradient.Parent = frame
+	
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = frame
+	
+	local shadow = Instance.new("ImageLabel")
+	shadow.Name = "Shadow"
+	shadow.Size = UDim2.new(1, 15, 1, 15)
+	shadow.Position = UDim2.new(0, -7, 0, -7)
+	shadow.BackgroundTransparency = 1
+	shadow.Image = "rbxassetid://1316045217"
+	shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	shadow.ImageTransparency = 0.9
+	shadow.ScaleType = Enum.ScaleType.Slice
+	shadow.SliceCenter = Rect.new(10, 10, 118, 118)
+	shadow.Parent = frame
+	
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Size = UDim2.new(1, 0, 0.6, 0)
+	textLabel.Position = UDim2.new(0, 0, 0, 5)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = "YUUGTRL"
+	textLabel.TextColor3 = colors.text
+	textLabel.Font = Enum.Font.GothamBold
+	textLabel.TextSize = 20
+	textLabel.Parent = frame
+	
+	local versionLabel = Instance.new("TextLabel")
+	versionLabel.Size = UDim2.new(1, 0, 0.3, 0)
+	versionLabel.Position = UDim2.new(0, 0, 0.6, -5)
+	versionLabel.BackgroundTransparency = 1
+	versionLabel.Text = "Library v1.0"
+	versionLabel.TextColor3 = colors.textDim
+	versionLabel.Font = Enum.Font.Gotham
+	versionLabel.TextSize = 12
+	versionLabel.Parent = frame
+	
+	local closeButton = Instance.new("TextButton")
+	closeButton.Size = UDim2.new(0, 20, 0, 20)
+	closeButton.Position = UDim2.new(1, -25, 0, 5)
+	closeButton.BackgroundColor3 = colors.danger
+	closeButton.Text = "×"
+	closeButton.TextColor3 = colors.text
+	closeButton.Font = Enum.Font.GothamBold
+	closeButton.TextSize = 16
+	closeButton.Parent = frame
+	
+	local closeCorner = Instance.new("UICorner")
+	closeCorner.CornerRadius = UDim.new(0, 4)
+	closeCorner.Parent = closeButton
+	
+	closeButton.MouseButton1Click:Connect(function()
+		frame:Destroy()
+		task.wait(0.5)
+		screenGui:Destroy()
+	end)
+	
+	task.spawn(function()
+		task.wait(10)
+		if frame and frame.Parent then
+			for i = 1, 10 do
+				task.wait(0.1)
+				frame.BackgroundTransparency = frame.BackgroundTransparency + 0.1
+				textLabel.TextTransparency = textLabel.TextTransparency + 0.1
+				versionLabel.TextTransparency = versionLabel.TextTransparency + 0.1
+				closeButton.BackgroundTransparency = closeButton.BackgroundTransparency + 0.1
+				closeButton.TextTransparency = closeButton.TextTransparency + 0.1
+				shadow.ImageTransparency = shadow.ImageTransparency + 0.1
+			end
+			frame:Destroy()
+			screenGui:Destroy()
+		end
+	end)
 end
 
 local function darkenColor(color, percent)
@@ -78,6 +175,8 @@ local function addShadow(parent, size, transparency)
 end
 
 function YUUGTRL:CreateWindow(options)
+	showWatermark()
+	
 	options = options or {}
 	
 	local window = {
