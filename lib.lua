@@ -107,81 +107,63 @@ function YUUGTRL:MakeButton(button, color, style)
     local btnColor = color or Color3.fromRGB(60, 100, 200)
     local btnStyle = style or "darken"
     local toggled = false
-    local hovered = false
     
     self:ApplyButtonStyle(button, btnColor)
     
     local connections = {}
     
-    if btnStyle == "darken" then
-        connections.down = button.MouseButton1Down:Connect(function() self:DarkenButton(button) end)
-        connections.up = button.MouseButton1Up:Connect(function() self:RestoreButtonStyle(button, btnColor) end)
-        connections.leave = button.MouseLeave:Connect(function() if not toggled then self:RestoreButtonStyle(button, btnColor) end end)
-    elseif btnStyle == "lighten" then
-        connections.down = button.MouseButton1Down:Connect(function() self:LightenButton(button) end)
-        connections.up = button.MouseButton1Up:Connect(function() self:RestoreButtonStyle(button, btnColor) end)
-        connections.leave = button.MouseLeave:Connect(function() if not toggled then self:RestoreButtonStyle(button, btnColor) end end)
-    elseif btnStyle == "toggle" then
-        connections.click = button.MouseButton1Click:Connect(function()
-            toggled = not toggled
-            if toggled then
-                self:DarkenButton(button)
-            else
-                self:RestoreButtonStyle(button, btnColor)
-            end
-        end)
-    elseif btnStyle == "hover" then
-        connections.enter = button.MouseEnter:Connect(function() self:LightenButton(button) end)
-        connections.leave = button.MouseLeave:Connect(function() self:RestoreButtonStyle(button, btnColor) end)
-    elseif btnStyle == "hover-dark" then
-        connections.enter = button.MouseEnter:Connect(function() self:DarkenButton(button) end)
-        connections.leave = button.MouseLeave:Connect(function() self:RestoreButtonStyle(button, btnColor) end)
-    end
-    
-    function button:SetStyle(newStyle, newColor)
+    local function ClearConnections()
         for _, conn in pairs(connections) do
             conn:Disconnect()
         end
-        table.clear(connections)
-        
-        btnStyle = newStyle or btnStyle
-        btnColor = newColor or btnColor
-        toggled = false
-        
-        self:ApplyButtonStyle(self, btnColor)
+        connections = {}
+    end
+    
+    local function SetupStyle()
+        ClearConnections()
         
         if btnStyle == "darken" then
-            connections.down = self.MouseButton1Down:Connect(function() YUUGTRL:DarkenButton(self) end)
-            connections.up = self.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(self, btnColor) end)
-            connections.leave = self.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(self, btnColor) end end)
+            connections.down = button.MouseButton1Down:Connect(function() YUUGTRL:DarkenButton(button) end)
+            connections.up = button.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
+            connections.leave = button.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(button, btnColor) end end)
         elseif btnStyle == "lighten" then
-            connections.down = self.MouseButton1Down:Connect(function() YUUGTRL:LightenButton(self) end)
-            connections.up = self.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(self, btnColor) end)
-            connections.leave = self.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(self, btnColor) end end)
+            connections.down = button.MouseButton1Down:Connect(function() YUUGTRL:LightenButton(button) end)
+            connections.up = button.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
+            connections.leave = button.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(button, btnColor) end end)
         elseif btnStyle == "toggle" then
-            connections.click = self.MouseButton1Click:Connect(function()
+            connections.click = button.MouseButton1Click:Connect(function()
                 toggled = not toggled
                 if toggled then
-                    YUUGTRL:DarkenButton(self)
+                    YUUGTRL:DarkenButton(button)
                 else
-                    YUUGTRL:RestoreButtonStyle(self, btnColor)
+                    YUUGTRL:RestoreButtonStyle(button, btnColor)
                 end
             end)
         elseif btnStyle == "hover" then
-            connections.enter = self.MouseEnter:Connect(function() YUUGTRL:LightenButton(self) end)
-            connections.leave = self.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(self, btnColor) end)
+            connections.enter = button.MouseEnter:Connect(function() YUUGTRL:LightenButton(button) end)
+            connections.leave = button.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
         elseif btnStyle == "hover-dark" then
-            connections.enter = self.MouseEnter:Connect(function() YUUGTRL:DarkenButton(self) end)
-            connections.leave = self.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(self, btnColor) end)
+            connections.enter = button.MouseEnter:Connect(function() YUUGTRL:DarkenButton(button) end)
+            connections.leave = button.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
         end
     end
     
-    function button:SetToggled(state)
+    SetupStyle()
+    
+    button.UpdateStyle = function(newStyle, newColor)
+        btnStyle = newStyle or btnStyle
+        btnColor = newColor or btnColor
+        toggled = false
+        self:ApplyButtonStyle(button, btnColor)
+        SetupStyle()
+    end
+    
+    button.SetToggled = function(state)
         toggled = state
         if toggled then
-            self:DarkenButton(button)
+            YUUGTRL:DarkenButton(button)
         else
-            self:RestoreButtonStyle(button, btnColor)
+            YUUGTRL:RestoreButtonStyle(button, btnColor)
         end
     end
     
