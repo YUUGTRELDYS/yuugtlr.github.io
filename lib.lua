@@ -70,7 +70,7 @@ function YUUGTRL:ApplyButtonStyle(button, color)
     gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, color),ColorSequenceKeypoint.new(1, darker)})
     gradient.Rotation = 90
     gradient.Parent = button
-    local brighter = Color3.fromRGB(math.min(color.R * 255 + 100, 255), math.min(color.G * 255 + 100, 255), math.min(color.B * 255 + 100, 255))
+    local brighter = Color3.fromRGB(math.min(color.R * 255 + 120, 255), math.min(color.G * 255 + 120, 255), math.min(color.B * 255 + 120, 255))
     button.TextColor3 = brighter
     button.Font = Enum.Font.GothamBold
     return button
@@ -99,7 +99,7 @@ function YUUGTRL:RestoreButtonStyle(button, color)
     local gradient = button:FindFirstChild("UIGradient")
     local darker = Color3.fromRGB(math.max(color.R * 255 - 50, 0), math.max(color.G * 255 - 50, 0), math.max(color.B * 255 - 50, 0))
     gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, color),ColorSequenceKeypoint.new(1, darker)})
-    local brighter = Color3.fromRGB(math.min(color.R * 255 + 100, 255), math.min(color.G * 255 + 100, 255), math.min(color.B * 255 + 100, 255))
+    local brighter = Color3.fromRGB(math.min(color.R * 255 + 120, 255), math.min(color.G * 255 + 120, 255), math.min(color.B * 255 + 120, 255))
     button.TextColor3 = brighter
 end
 
@@ -143,20 +143,6 @@ function YUUGTRL:MakeButton(button, color, style)
                 self:RestoreButtonStyle(button, btnColor)
             end
         end)
-    elseif btnStyle == "hover" then
-        button.MouseEnter:Connect(function() 
-            self:LightenButton(button) 
-        end)
-        button.MouseLeave:Connect(function() 
-            self:RestoreButtonStyle(button, btnColor) 
-        end)
-    elseif btnStyle == "hover-dark" then
-        button.MouseEnter:Connect(function() 
-            self:DarkenButton(button) 
-        end)
-        button.MouseLeave:Connect(function() 
-            self:RestoreButtonStyle(button, btnColor) 
-        end)
     end
     
     return button
@@ -192,15 +178,15 @@ function YUUGTRL:CreateWindow(title, size, position)
     
     Create({type = "UICorner",CornerRadius = UDim.new(0, 8),Parent = Header})
     
-    local Title = self:CreateLabel(Header, title or "YUUGTRL", UDim2.new(0, 15, 0, 0), UDim2.new(1, -100, 1, 0))
+    local Title = self:CreateLabel(Header, title or "YUUGTRL", UDim2.new(0, 15, 0, 0), UDim2.new(1, -120, 1, 0))
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextSize = 18
     
-    local Close = self:CreateButton(Header, "X", nil, Color3.fromRGB(255, 80, 80), UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30), "darken")
-    Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+    local SettingsBtn = self:CreateButton(Header, "⚙", nil, Color3.fromRGB(100, 100, 200), UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30), "darken")
     
-    local CustomBtn = self:CreateButton(Header, "...", nil, Color3.fromRGB(100, 120, 255), UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30), "hover")
+    local Close = self:CreateButton(Header, "X", nil, Color3.fromRGB(255, 100, 100), UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30), "darken")
+    Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
     
     ScreenGui.Parent = player:WaitForChild("PlayerGui")
     
@@ -238,7 +224,7 @@ function YUUGTRL:CreateWindow(title, size, position)
         Header = Header,
         Title = Title,
         Close = Close,
-        CustomBtn = CustomBtn
+        SettingsBtn = SettingsBtn
     }
     
     function window:AddToHeader(instance, position, size)
@@ -253,11 +239,37 @@ function YUUGTRL:CreateWindow(title, size, position)
         if size then instance.Size = size end
     end
     
+    function window:SetSettingsCallback(callback)
+        SettingsBtn.MouseButton1Click:Connect(callback)
+    end
+    
     function window:Destroy()
         ScreenGui:Destroy()
     end
     
     return window
+end
+
+function YUUGTRL:CreateMonitor(parent, items, position, size)
+    local frame = self:CreateFrame(parent, size or UDim2.new(1, -20, 0, #items * 28 + 10), position or UDim2.new(0, 10, 0, 10), Color3.fromRGB(35, 35, 45))
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 8),Parent = frame})
+    
+    local y = 5
+    local labels = {}
+    
+    for i, item in pairs(items) do
+        local label = self:CreateLabel(frame, item.name .. ": " .. tostring(item.value), UDim2.new(0, 10, 0, y), UDim2.new(1, -20, 0, 25))
+        table.insert(labels, {label = label, getName = item.name, getValue = item.getValue})
+        y = y + 28
+    end
+    
+    function frame:Update()
+        for _, item in pairs(labels) do
+            item.label.Text = item.getName .. ": " .. tostring(item.getValue())
+        end
+    end
+    
+    return frame
 end
 
 function YUUGTRL:CreateFrame(parent, size, position, color)
