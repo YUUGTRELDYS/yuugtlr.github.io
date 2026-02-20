@@ -58,6 +58,19 @@ local function Create(props)
     return obj
 end
 
+local function ApplyButtonStyle(button, color)
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(math.min(color.R * 255 + 30, 255), math.min(color.G * 255 + 30, 255), math.min(color.B * 255 + 30, 255))),
+        ColorSequenceKeypoint.new(1, color)
+    })
+    gradient.Rotation = 90
+    gradient.Parent = button
+    
+    local brighter = Color3.fromRGB(math.min(color.R * 255 + 50, 255), math.min(color.G * 255 + 50, 255), math.min(color.B * 255 + 50, 255))
+    button.TextColor3 = brighter
+end
+
 function YUUGTRL:CreateWindow(title)
     local ScreenGui = Create({
         type = "ScreenGui",
@@ -126,6 +139,7 @@ function YUUGTRL:CreateWindow(title)
         CornerRadius = UDim.new(0, 6),
         Parent = Close
     })
+    ApplyButtonStyle(Close, Color3.fromRGB(255, 50, 50))
     
     local Tabs = Create({
         type = "Frame",
@@ -214,6 +228,7 @@ function YUUGTRL:CreateWindow(title)
             CornerRadius = UDim.new(0, 6),
             Parent = TabButton
         })
+        ApplyButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))
         
         lastTabPosition = lastTabPosition + 85
         
@@ -236,10 +251,10 @@ function YUUGTRL:CreateWindow(title)
         TabButton.MouseButton1Click:Connect(function()
             for _, btn in pairs(self.tabButtons) do
                 btn.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-                btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+                ApplyButtonStyle(btn, Color3.fromRGB(50, 50, 60))
             end
             TabButton.BackgroundColor3 = Color3.fromRGB(80, 100, 220)
-            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            ApplyButtonStyle(TabButton, Color3.fromRGB(80, 100, 220))
             
             for _, child in pairs(self.Container:GetChildren()) do
                 if child:IsA("ScrollingFrame") then
@@ -272,6 +287,7 @@ function YUUGTRL:CreateWindow(title)
                 CornerRadius = UDim.new(0, 6),
                 Parent = Button
             })
+            ApplyButtonStyle(Button, Color3.fromRGB(60, 60, 70))
             
             Button.MouseButton1Click:Connect(function()
                 local success, err = pcall(callback)
@@ -295,13 +311,21 @@ function YUUGTRL:CreateWindow(title)
                 Parent = ToggleFrame
             })
             
+            local gradient = Instance.new("UIGradient")
+            gradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))
+            })
+            gradient.Rotation = 90
+            gradient.Parent = ToggleFrame
+            
             Create({
                 type = "TextLabel",
                 Size = UDim2.new(1, -50, 1, 0),
                 Position = UDim2.new(0, 10, 0, 0),
                 BackgroundTransparency = 1,
                 Text = text,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = Color3.fromRGB(220, 220, 255),
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
@@ -322,12 +346,14 @@ function YUUGTRL:CreateWindow(title)
                 CornerRadius = UDim.new(0, 15),
                 Parent = ToggleBtn
             })
+            ApplyButtonStyle(ToggleBtn, ToggleBtn.BackgroundColor3)
             
             local toggled = default or false
             
             ToggleBtn.MouseButton1Click:Connect(function()
                 toggled = not toggled
                 ToggleBtn.BackgroundColor3 = toggled and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
+                ApplyButtonStyle(ToggleBtn, ToggleBtn.BackgroundColor3)
                 local success, err = pcall(callback, toggled)
                 if not success then warn(err) end
             end)
@@ -349,13 +375,21 @@ function YUUGTRL:CreateWindow(title)
                 Parent = SliderFrame
             })
             
+            local gradient = Instance.new("UIGradient")
+            gradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))
+            })
+            gradient.Rotation = 90
+            gradient.Parent = SliderFrame
+            
             Create({
                 type = "TextLabel",
                 Size = UDim2.new(1, -20, 0, 20),
                 Position = UDim2.new(0, 10, 0, 5),
                 BackgroundTransparency = 1,
                 Text = text,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = Color3.fromRGB(220, 220, 255),
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
@@ -400,6 +434,7 @@ function YUUGTRL:CreateWindow(title)
                 CornerRadius = UDim.new(0, 5),
                 Parent = Fill
             })
+            ApplyButtonStyle(Fill, Color3.fromRGB(80, 100, 220))
             
             local dragging = false
             
