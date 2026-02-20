@@ -7,7 +7,6 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local isMobile = UserInputService.TouchEnabled
 
--- Показываем сообщение о загрузке (нельзя убрать)
 local function showLoadMessage()
     local msgGui = Instance.new("ScreenGui")
     msgGui.Name = "YUUGTRL_LoadMessage"
@@ -38,7 +37,6 @@ local function showLoadMessage()
     msgGui:Destroy()
 end
 
--- Запускаем сообщение
 spawn(showLoadMessage)
 
 local function createShadow(parent)
@@ -63,9 +61,7 @@ local function createCorner(parent, radius)
     return corner
 end
 
--- Функция для создания градиента на кнопке (сверху светлее, снизу темнее)
 local function createButtonGradient(button, baseColor)
-    -- Делаем верхнюю часть светлее на 20%, нижнюю часть темнее на 20%
     local r, g, b = baseColor.R, baseColor.G, baseColor.B
     
     local lighter = Color3.new(
@@ -80,42 +76,32 @@ local function createButtonGradient(button, baseColor)
         b * 0.7
     )
     
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, lighter),
-        ColorSequenceKeypoint.new(1, darker)
-    })
-    gradient.Rotation = 90 -- Вертикальный градиент (сверху вниз)
-    gradient.Parent = button
-    return gradient
-end
-
--- Функция для создания яркого текста
-local function createBrightText(parent, text, size)
-    local label = Instance.new("TextLabel")
-    label.BackgroundTransparency = 1
-    label.Text = text
-    label.TextColor3 = Color3.fromRGB(255, 255, 255) -- Чисто белый яркий текст
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = size or (isMobile and 12 or 14)
-    label.TextStrokeTransparency = 0.8 -- Легкая обводка для контраста
-    label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-    label.Parent = parent
-    return label
-end
-
-local function animateButton(button, enabled, enabledColor, disabledColor)
-    local targetColor = enabled and (enabledColor or Color3.fromRGB(80, 180, 120)) or (disabledColor or button.BaseColor or Color3.fromRGB(80, 100, 220))
-    local tween = TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = targetColor})
-    tween:Play()
-    
-    -- Обновляем градиент при изменении цвета
     for _, child in pairs(button:GetChildren()) do
         if child:IsA("UIGradient") then
             child:Destroy()
         end
     end
-    createButtonGradient(button, targetColor)
+    
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, lighter),
+        ColorSequenceKeypoint.new(1, darker)
+    })
+    gradient.Rotation = 90
+    gradient.Parent = button
+end
+
+local function createBrightText(parent, text, size)
+    local label = Instance.new("TextLabel")
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = size or (isMobile and 12 or 14)
+    label.TextStrokeTransparency = 0.8
+    label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    label.Parent = parent
+    return label
 end
 
 local function makeDraggable(frame, handle)
@@ -182,7 +168,6 @@ function YUUGTRL:CreateWindow(title, size)
     createShadow(mainFrame)
     createCorner(mainFrame, 16)
     
-    -- Градиент для фона окна
     local windowGradient = Instance.new("UIGradient")
     windowGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 50)),
@@ -198,7 +183,6 @@ function YUUGTRL:CreateWindow(title, size)
     header.BorderSizePixel = 0
     header.Parent = mainFrame
     
-    -- Градиент для хедера
     local headerGradient = Instance.new("UIGradient")
     headerGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 80)),
@@ -218,7 +202,6 @@ function YUUGTRL:CreateWindow(title, size)
     closeButton.Size = UDim2.new(0, isMobile and 26 or 32, 0, isMobile and 26 or 32)
     closeButton.Position = UDim2.new(1, isMobile and -30 or -37, 0, isMobile and 4 or 6)
     closeButton.BackgroundColor3 = Color3.fromRGB(200, 70, 70)
-    closeButton.BaseColor = Color3.fromRGB(200, 70, 70)
     closeButton.Text = ""
     closeButton.Parent = header
     
@@ -279,7 +262,6 @@ function YUUGTRL:CreateWindow(title, size)
         button.Name = text .. "Button"
         button.Size = UDim2.new(1, -10, 0, isMobile and 35 or 40)
         button.BackgroundColor3 = color
-        button.BaseColor = color
         button.Text = ""
         button.Parent = self.Container
         
@@ -290,10 +272,7 @@ function YUUGTRL:CreateWindow(title, size)
         buttonText.Size = UDim2.new(1, 0, 1, 0)
         
         button.MouseButton1Click:Connect(function()
-            animateButton(button, true, Color3.fromRGB(80, 180, 120), color)
             if callback then callback() end
-            task.wait(0.2)
-            animateButton(button, false, Color3.fromRGB(80, 180, 120), color)
         end)
         
         table.insert(self.Elements, button)
@@ -317,7 +296,6 @@ function YUUGTRL:CreateWindow(title, size)
         toggleButton.Size = UDim2.new(0, isMobile and 50 or 60, 0, isMobile and 25 or 30)
         toggleButton.Position = UDim2.new(1, -(isMobile and 55 or 65), 0.5, -(isMobile and 12.5 or 15))
         toggleButton.BackgroundColor3 = default and Color3.fromRGB(80, 180, 120) or Color3.fromRGB(200, 70, 70)
-        toggleButton.BaseColor = toggleButton.BackgroundColor3
         toggleButton.Text = ""
         toggleButton.Parent = frame
         
@@ -334,15 +312,7 @@ function YUUGTRL:CreateWindow(title, size)
             toggleText.Text = toggled and "ON" or "OFF"
             local newColor = toggled and Color3.fromRGB(80, 180, 120) or Color3.fromRGB(200, 70, 70)
             toggleButton.BackgroundColor3 = newColor
-            toggleButton.BaseColor = newColor
-            
-            for _, child in pairs(toggleButton:GetChildren()) do
-                if child:IsA("UIGradient") then
-                    child:Destroy()
-                end
-            end
             createButtonGradient(toggleButton, newColor)
-            
             if callback then callback(toggled) end
         end)
         
