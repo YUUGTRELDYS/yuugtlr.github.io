@@ -64,16 +64,11 @@ local function ApplyButtonStyle(button, color)
             v:Destroy()
         end
     end
-    
     local darker = Color3.fromRGB(math.max(color.R * 255 - 30, 0), math.max(color.G * 255 - 30, 0), math.max(color.B * 255 - 30, 0))
     local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, color),
-        ColorSequenceKeypoint.new(1, darker)
-    })
+    gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, color),ColorSequenceKeypoint.new(1, darker)})
     gradient.Rotation = 90
     gradient.Parent = button
-    
     local brighter = Color3.fromRGB(math.min(color.R * 255 + 40, 255), math.min(color.G * 255 + 40, 255), math.min(color.B * 255 + 40, 255))
     button.TextColor3 = brighter
 end
@@ -83,20 +78,14 @@ local function DarkenButton(button)
     local gradient = button:FindFirstChild("UIGradient")
     local color = gradient.Color.Keypoints[1].Value
     local darker = Color3.fromRGB(math.max(color.R * 255 - 50, 0), math.max(color.G * 255 - 50, 0), math.max(color.B * 255 - 50, 0))
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, darker),
-        ColorSequenceKeypoint.new(1, darker)
-    })
+    gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, darker),ColorSequenceKeypoint.new(1, darker)})
 end
 
 local function RestoreButtonStyle(button, color)
     if not button:FindFirstChild("UIGradient") then return end
     local gradient = button:FindFirstChild("UIGradient")
     local darker = Color3.fromRGB(math.max(color.R * 255 - 30, 0), math.max(color.G * 255 - 30, 0), math.max(color.B * 255 - 30, 0))
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, color),
-        ColorSequenceKeypoint.new(1, darker)
-    })
+    gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, color),ColorSequenceKeypoint.new(1, darker)})
 end
 
 function YUUGTRL:CreateWindow(title)
@@ -117,11 +106,7 @@ function YUUGTRL:CreateWindow(title)
         Parent = ScreenGui
     })
     
-    Create({
-        type = "UICorner",
-        CornerRadius = UDim.new(0, 8),
-        Parent = Main
-    })
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 8),Parent = Main})
     
     local Header = Create({
         type = "Frame",
@@ -131,11 +116,7 @@ function YUUGTRL:CreateWindow(title)
         Parent = Main
     })
     
-    Create({
-        type = "UICorner",
-        CornerRadius = UDim.new(0, 8),
-        Parent = Header
-    })
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 8),Parent = Header})
     
     Create({
         type = "TextLabel",
@@ -162,22 +143,12 @@ function YUUGTRL:CreateWindow(title)
         Parent = Header
     })
     
-    Create({
-        type = "UICorner",
-        CornerRadius = UDim.new(0, 6),
-        Parent = Close
-    })
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 6),Parent = Close})
     ApplyButtonStyle(Close, Color3.fromRGB(255, 50, 50))
     
-    Close.MouseButton1Down:Connect(function()
-        DarkenButton(Close)
-    end)
-    Close.MouseButton1Up:Connect(function()
-        RestoreButtonStyle(Close, Color3.fromRGB(255, 50, 50))
-    end)
-    Close.MouseLeave:Connect(function()
-        RestoreButtonStyle(Close, Color3.fromRGB(255, 50, 50))
-    end)
+    Close.MouseButton1Down:Connect(function()DarkenButton(Close)end)
+    Close.MouseButton1Up:Connect(function()RestoreButtonStyle(Close, Color3.fromRGB(255, 50, 50))end)
+    Close.MouseLeave:Connect(function()RestoreButtonStyle(Close, Color3.fromRGB(255, 50, 50))end)
     
     local Tabs = Create({
         type = "Frame",
@@ -197,12 +168,7 @@ function YUUGTRL:CreateWindow(title)
         Parent = Main
     })
     
-    Create({
-        type = "UIListLayout",
-        Padding = UDim.new(0, 5),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Parent = Container
-    })
+    Create({type = "UIListLayout",Padding = UDim.new(0, 5),SortOrder = Enum.SortOrder.LayoutOrder,Parent = Container})
     
     ScreenGui.Parent = player:WaitForChild("PlayerGui")
     
@@ -234,18 +200,9 @@ function YUUGTRL:CreateWindow(title)
         end
     end)
     
-    Close.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
+    Close.MouseButton1Click:Connect(function()ScreenGui:Destroy()end)
     
-    local window = {
-        Main = Main,
-        Tabs = Tabs,
-        Container = Container,
-        ScreenGui = ScreenGui,
-        tabButtons = {}
-    }
-    
+    local window = {Main = Main,Tabs = Tabs,Container = Container,ScreenGui = ScreenGui,tabButtons = {}}
     local lastTabPosition = 0
     
     function window:CreateTab(name)
@@ -261,22 +218,12 @@ function YUUGTRL:CreateWindow(title)
             Parent = self.Tabs
         })
         
-        Create({
-            type = "UICorner",
-            CornerRadius = UDim.new(0, 6),
-            Parent = TabButton
-        })
+        Create({type = "UICorner",CornerRadius = UDim.new(0, 6),Parent = TabButton})
         ApplyButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))
         
-        TabButton.MouseButton1Down:Connect(function()
-            DarkenButton(TabButton)
-        end)
-        TabButton.MouseButton1Up:Connect(function()
-            RestoreButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))
-        end)
-        TabButton.MouseLeave:Connect(function()
-            RestoreButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))
-        end)
+        TabButton.MouseButton1Down:Connect(function()DarkenButton(TabButton)end)
+        TabButton.MouseButton1Up:Connect(function()RestoreButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))end)
+        TabButton.MouseLeave:Connect(function()RestoreButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))end)
         
         lastTabPosition = lastTabPosition + 85
         
@@ -289,12 +236,7 @@ function YUUGTRL:CreateWindow(title)
             Parent = self.Container
         })
         
-        Create({
-            type = "UIListLayout",
-            Padding = UDim.new(0, 8),
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Parent = tabFrame
-        })
+        Create({type = "UIListLayout",Padding = UDim.new(0, 8),SortOrder = Enum.SortOrder.LayoutOrder,Parent = tabFrame})
         
         TabButton.MouseButton1Click:Connect(function()
             for _, btn in pairs(self.tabButtons) do
@@ -314,40 +256,32 @@ function YUUGTRL:CreateWindow(title)
         
         table.insert(self.tabButtons, TabButton)
         
-        local tab = {
-            Frame = tabFrame
-        }
+        local tab = {Frame = tabFrame}
         
-        function tab:CreateButton(text, callback, color)
+        function tab:CreateButton(text, callback, color, parent, position, size)
+            local btnParent = parent or tabFrame
             local btnColor = color or Color3.fromRGB(60, 100, 200)
+            local btnSize = size or UDim2.new(1, -10, 0, 35)
+            local btnPos = position or UDim2.new(0, 0, 0, 0)
             
             local Button = Create({
                 type = "TextButton",
-                Size = UDim2.new(1, -10, 0, 35),
+                Size = btnSize,
+                Position = btnPos,
                 BackgroundColor3 = btnColor,
                 Text = text,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
-                Parent = tabFrame
+                Parent = btnParent
             })
             
-            Create({
-                type = "UICorner",
-                CornerRadius = UDim.new(0, 6),
-                Parent = Button
-            })
+            Create({type = "UICorner",CornerRadius = UDim.new(0, 6),Parent = Button})
             ApplyButtonStyle(Button, btnColor)
             
-            Button.MouseButton1Down:Connect(function()
-                DarkenButton(Button)
-            end)
-            Button.MouseButton1Up:Connect(function()
-                RestoreButtonStyle(Button, btnColor)
-            end)
-            Button.MouseLeave:Connect(function()
-                RestoreButtonStyle(Button, btnColor)
-            end)
+            Button.MouseButton1Down:Connect(function()DarkenButton(Button)end)
+            Button.MouseButton1Up:Connect(function()RestoreButtonStyle(Button, btnColor)end)
+            Button.MouseLeave:Connect(function()RestoreButtonStyle(Button, btnColor)end)
             
             Button.MouseButton1Click:Connect(function()
                 local success, err = pcall(callback)
@@ -357,25 +291,23 @@ function YUUGTRL:CreateWindow(title)
             return Button
         end
         
-        function tab:CreateToggle(text, default, callback)
+        function tab:CreateToggle(text, default, callback, parent, position, size)
+            local btnParent = parent or tabFrame
+            local btnSize = size or UDim2.new(1, -10, 0, 35)
+            local btnPos = position or UDim2.new(0, 0, 0, 0)
+            
             local ToggleFrame = Create({
                 type = "Frame",
-                Size = UDim2.new(1, -10, 0, 35),
+                Size = btnSize,
+                Position = btnPos,
                 BackgroundColor3 = Color3.fromRGB(60, 60, 70),
-                Parent = tabFrame
+                Parent = btnParent
             })
             
-            Create({
-                type = "UICorner",
-                CornerRadius = UDim.new(0, 6),
-                Parent = ToggleFrame
-            })
+            Create({type = "UICorner",CornerRadius = UDim.new(0, 6),Parent = ToggleFrame})
             
             local gradient = Instance.new("UIGradient")
-            gradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))
-            })
+            gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))})
             gradient.Rotation = 90
             gradient.Parent = ToggleFrame
             
@@ -402,22 +334,12 @@ function YUUGTRL:CreateWindow(title)
                 Parent = ToggleFrame
             })
             
-            Create({
-                type = "UICorner",
-                CornerRadius = UDim.new(0, 15),
-                Parent = ToggleBtn
-            })
+            Create({type = "UICorner",CornerRadius = UDim.new(0, 15),Parent = ToggleBtn})
             ApplyButtonStyle(ToggleBtn, toggleColor)
             
-            ToggleBtn.MouseButton1Down:Connect(function()
-                DarkenButton(ToggleBtn)
-            end)
-            ToggleBtn.MouseButton1Up:Connect(function()
-                RestoreButtonStyle(ToggleBtn, toggleColor)
-            end)
-            ToggleBtn.MouseLeave:Connect(function()
-                RestoreButtonStyle(ToggleBtn, toggleColor)
-            end)
+            ToggleBtn.MouseButton1Down:Connect(function()DarkenButton(ToggleBtn)end)
+            ToggleBtn.MouseButton1Up:Connect(function()RestoreButtonStyle(ToggleBtn, toggleColor)end)
+            ToggleBtn.MouseLeave:Connect(function()RestoreButtonStyle(ToggleBtn, toggleColor)end)
             
             local toggled = default or false
             
@@ -433,25 +355,23 @@ function YUUGTRL:CreateWindow(title)
             return ToggleBtn
         end
         
-        function tab:CreateSlider(text, min, max, default, callback)
+        function tab:CreateSlider(text, min, max, default, callback, parent, position, size)
+            local btnParent = parent or tabFrame
+            local btnSize = size or UDim2.new(1, -10, 0, 50)
+            local btnPos = position or UDim2.new(0, 0, 0, 0)
+            
             local SliderFrame = Create({
                 type = "Frame",
-                Size = UDim2.new(1, -10, 0, 50),
+                Size = btnSize,
+                Position = btnPos,
                 BackgroundColor3 = Color3.fromRGB(60, 60, 70),
-                Parent = tabFrame
+                Parent = btnParent
             })
             
-            Create({
-                type = "UICorner",
-                CornerRadius = UDim.new(0, 6),
-                Parent = SliderFrame
-            })
+            Create({type = "UICorner",CornerRadius = UDim.new(0, 6),Parent = SliderFrame})
             
             local gradient = Instance.new("UIGradient")
-            gradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))
-            })
+            gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))})
             gradient.Rotation = 90
             gradient.Parent = SliderFrame
             
@@ -488,11 +408,7 @@ function YUUGTRL:CreateWindow(title)
                 Parent = SliderFrame
             })
             
-            Create({
-                type = "UICorner",
-                CornerRadius = UDim.new(0, 5),
-                Parent = Slider
-            })
+            Create({type = "UICorner",CornerRadius = UDim.new(0, 5),Parent = Slider})
             
             local Fill = Create({
                 type = "Frame",
@@ -501,11 +417,7 @@ function YUUGTRL:CreateWindow(title)
                 Parent = Slider
             })
             
-            Create({
-                type = "UICorner",
-                CornerRadius = UDim.new(0, 5),
-                Parent = Fill
-            })
+            Create({type = "UICorner",CornerRadius = UDim.new(0, 5),Parent = Fill})
             ApplyButtonStyle(Fill, Color3.fromRGB(80, 100, 220))
             
             local dragging = false
@@ -538,16 +450,22 @@ function YUUGTRL:CreateWindow(title)
             return Slider
         end
         
-        function tab:CreateLabel(text)
+        function tab:CreateLabel(text, parent, position, size, color)
+            local lblParent = parent or tabFrame
+            local lblSize = size or UDim2.new(1, -10, 0, 30)
+            local lblPos = position or UDim2.new(0, 0, 0, 0)
+            local txtColor = color or Color3.fromRGB(200, 200, 255)
+            
             local Label = Create({
                 type = "TextLabel",
-                Size = UDim2.new(1, -10, 0, 30),
+                Size = lblSize,
+                Position = lblPos,
                 BackgroundTransparency = 1,
                 Text = text,
-                TextColor3 = Color3.fromRGB(200, 200, 255),
+                TextColor3 = txtColor,
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
-                Parent = tabFrame
+                Parent = lblParent
             })
             
             return Label
