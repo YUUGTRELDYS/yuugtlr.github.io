@@ -111,71 +111,39 @@ function YUUGTRL:MakeButton(button, color, style)
     
     self:ApplyButtonStyle(button, btnColor)
     
-    local connections = {}
-    
-    local function ClearConnections()
-        for _, conn in pairs(connections) do
-            conn:Disconnect()
-        end
-        connections = {}
-    end
-    
-    local function SetupStyle()
-        ClearConnections()
-        
-        if btnStyle == "darken" then
-            connections.down = button.MouseButton1Down:Connect(function() YUUGTRL:DarkenButton(button) end)
-            connections.up = button.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
-            connections.leave = button.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(button, btnColor) end end)
-        elseif btnStyle == "lighten" then
-            connections.down = button.MouseButton1Down:Connect(function() YUUGTRL:LightenButton(button) end)
-            connections.up = button.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
-            connections.leave = button.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(button, btnColor) end end)
-        elseif btnStyle == "toggle" then
-            connections.click = button.MouseButton1Click:Connect(function()
-                toggled = not toggled
-                if toggled then
-                    YUUGTRL:DarkenButton(button)
-                else
-                    YUUGTRL:RestoreButtonStyle(button, btnColor)
-                end
-            end)
-        elseif btnStyle == "hover" then
-            connections.enter = button.MouseEnter:Connect(function() YUUGTRL:LightenButton(button) end)
-            connections.leave = button.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
-        elseif btnStyle == "hover-dark" then
-            connections.enter = button.MouseEnter:Connect(function() YUUGTRL:DarkenButton(button) end)
-            connections.leave = button.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
-        elseif btnStyle == "roblox-default" then
-            button.Style = Enum.ButtonStyle.RobloxButtonDefault
-        elseif btnStyle == "roblox-button" then
-            button.Style = Enum.ButtonStyle.RobloxButton
-        elseif btnStyle == "roblox-round" then
-            button.Style = Enum.ButtonStyle.RobloxRoundButton
-        elseif btnStyle == "roblox-round-default" then
-            button.Style = Enum.ButtonStyle.RobloxRoundDefaultButton
-        elseif btnStyle == "roblox-round-dropdown" then
-            button.Style = Enum.ButtonStyle.RobloxRoundDropdownButton
-        end
-    end
-    
-    SetupStyle()
-    
-    button.UpdateStyle = function(newStyle, newColor)
-        btnStyle = newStyle or btnStyle
-        btnColor = newColor or btnColor
-        toggled = false
-        self:ApplyButtonStyle(button, btnColor)
-        SetupStyle()
-    end
-    
-    button.SetToggled = function(state)
-        toggled = state
-        if toggled then
-            YUUGTRL:DarkenButton(button)
-        else
-            YUUGTRL:RestoreButtonStyle(button, btnColor)
-        end
+    if btnStyle == "darken" then
+        button.MouseButton1Down:Connect(function() YUUGTRL:DarkenButton(button) end)
+        button.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
+        button.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(button, btnColor) end end)
+    elseif btnStyle == "lighten" then
+        button.MouseButton1Down:Connect(function() YUUGTRL:LightenButton(button) end)
+        button.MouseButton1Up:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
+        button.MouseLeave:Connect(function() if not toggled then YUUGTRL:RestoreButtonStyle(button, btnColor) end end)
+    elseif btnStyle == "toggle" then
+        button.MouseButton1Click:Connect(function()
+            toggled = not toggled
+            if toggled then
+                YUUGTRL:DarkenButton(button)
+            else
+                YUUGTRL:RestoreButtonStyle(button, btnColor)
+            end
+        end)
+    elseif btnStyle == "hover" then
+        button.MouseEnter:Connect(function() YUUGTRL:LightenButton(button) end)
+        button.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
+    elseif btnStyle == "hover-dark" then
+        button.MouseEnter:Connect(function() YUUGTRL:DarkenButton(button) end)
+        button.MouseLeave:Connect(function() YUUGTRL:RestoreButtonStyle(button, btnColor) end)
+    elseif btnStyle == "roblox-default" then
+        button.Style = Enum.ButtonStyle.RobloxButtonDefault
+    elseif btnStyle == "roblox-button" then
+        button.Style = Enum.ButtonStyle.RobloxButton
+    elseif btnStyle == "roblox-round" then
+        button.Style = Enum.ButtonStyle.RobloxRoundButton
+    elseif btnStyle == "roblox-round-default" then
+        button.Style = Enum.ButtonStyle.RobloxRoundDefaultButton
+    elseif btnStyle == "roblox-round-dropdown" then
+        button.Style = Enum.ButtonStyle.RobloxRoundDropdownButton
     end
     
     return button
