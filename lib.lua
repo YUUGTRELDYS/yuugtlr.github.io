@@ -8,16 +8,19 @@ local isMobile = UserInputService.TouchEnabled
 
 local isLoading = true
 local windows = {}
+local loadGui = nil
+local loadFrame = nil
+local loadComplete = false
 
-local function showLoadMessage()
-    local loadGui = Instance.new("ScreenGui")
+local function showLoadMessage(callback)
+    loadGui = Instance.new("ScreenGui")
     loadGui.Name = "YUUGTRL_Loader"
     loadGui.ResetOnSpawn = false
     loadGui.Parent = player:WaitForChild("PlayerGui")
     loadGui.IgnoreGuiInset = true
     loadGui.DisplayOrder = 9999
     
-    local loadFrame = Instance.new("Frame")
+    loadFrame = Instance.new("Frame")
     loadFrame.Name = "LoadFrame"
     loadFrame.Size = UDim2.new(0, 300, 0, 120)
     loadFrame.Position = UDim2.new(0.5, -150, 0.5, -60)
@@ -110,27 +113,28 @@ local function showLoadMessage()
     local steps = {"Initializing...", "Loading UI...", "Creating elements...", "Almost ready...", "Done!"}
     local step = 0
     
-    for i = 1, 100 do
-        step = math.floor(i / 20) + 1
+    for i = 1, 30 do
+        step = math.floor(i / 6) + 1
         if step > 5 then step = 5 end
         status.Text = steps[step]
-        progressFill.Size = UDim2.new(i / 100, 0, 1, 0)
-        if i == 30 then wait(0.1) end
-        if i == 50 then wait(0.1) end
-        if i == 70 then wait(0.1) end
-        if i == 90 then wait(0.1) end
-        wait(0.02)
+        progressFill.Size = UDim2.new(i / 30, 0, 1, 0)
+        wait(0.01)
     end
     
-    wait(0.3)
+    wait(0.2)
     
-    local tweenOut = TweenService:Create(loadFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+    if callback then
+        callback()
+    end
+    
+    local tweenOut = TweenService:Create(loadFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
         Position = UDim2.new(0.5, -150, 1.5, 0)
     })
     tweenOut:Play()
     
     tweenOut.Completed:Connect(function()
         loadGui:Destroy()
+        loadComplete = true
         isLoading = false
         for _, window in ipairs(windows) do
             if window and window.MainFrame then
@@ -1306,6 +1310,8 @@ function YUUGTRL:IsMobile()
     return isMobile
 end
 
-spawn(showLoadMessage)
+function YUUGTRL:Start(scriptFunction)
+    showLoadMessage(scriptFunction)
+end
 
 return YUUGTRL
