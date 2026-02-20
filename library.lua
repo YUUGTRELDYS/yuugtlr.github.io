@@ -6,6 +6,65 @@ local userInputService = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local isMobile = userInputService.TouchEnabled
 
+local closeStyles = {
+    classic = {text = "✕", color = Color3.fromRGB(255, 80, 80), hover = Color3.fromRGB(255, 120, 120)},
+    modern = {text = "🗙", color = Color3.fromRGB(220, 70, 70), hover = Color3.fromRGB(255, 100, 100)},
+    circle = {text = "●", color = Color3.fromRGB(255, 60, 60), hover = Color3.fromRGB(255, 100, 100)},
+    square = {text = "⬛", color = Color3.fromRGB(200, 60, 60), hover = Color3.fromRGB(230, 80, 80)},
+    arrow = {text = "←", color = Color3.fromRGB(100, 100, 255), hover = Color3.fromRGB(140, 140, 255)},
+    arrow2 = {text = "↩", color = Color3.fromRGB(100, 200, 100), hover = Color3.fromRGB(140, 240, 140)},
+    power = {text = "⏻", color = Color3.fromRGB(255, 100, 100), hover = Color3.fromRGB(255, 140, 140)},
+    heart = {text = "❤", color = Color3.fromRGB(255, 80, 120), hover = Color3.fromRGB(255, 120, 160)},
+    star = {text = "★", color = Color3.fromRGB(255, 200, 80), hover = Color3.fromRGB(255, 220, 120)},
+    skull = {text = "☠", color = Color3.fromRGB(150, 150, 150), hover = Color3.fromRGB(200, 200, 200)},
+    ghost = {text = "👻", color = Color3.fromRGB(200, 200, 255), hover = Color3.fromRGB(230, 230, 255)},
+    fire = {text = "🔥", color = Color3.fromRGB(255, 120, 0), hover = Color3.fromRGB(255, 160, 80)},
+    snow = {text = "❄", color = Color3.fromRGB(100, 200, 255), hover = Color3.fromRGB(150, 220, 255)},
+    check = {text = "✓", color = Color3.fromRGB(80, 200, 80), hover = Color3.fromRGB(120, 240, 120)},
+    x = {text = "✗", color = Color3.fromRGB(255, 80, 80), hover = Color3.fromRGB(255, 120, 120)},
+    settings = {text = "⚙", color = Color3.fromRGB(100, 150, 255), hover = Color3.fromRGB(140, 180, 255)},
+    menu = {text = "☰", color = Color3.fromRGB(180, 180, 180), hover = Color3.fromRGB(220, 220, 220)},
+    info = {text = "ⓘ", color = Color3.fromRGB(80, 150, 255), hover = Color3.fromRGB(120, 180, 255)},
+    warning = {text = "⚠", color = Color3.fromRGB(255, 180, 0), hover = Color3.fromRGB(255, 220, 80)},
+    lock = {text = "🔒", color = Color3.fromRGB(150, 150, 150), hover = Color3.fromRGB(200, 200, 200)},
+    unlock = {text = "🔓", color = Color3.fromRGB(100, 200, 100), hover = Color3.fromRGB(140, 240, 140)},
+    search = {text = "🔍", color = Color3.fromRGB(100, 150, 200), hover = Color3.fromRGB(140, 190, 240)},
+    bell = {text = "🔔", color = Color3.fromRGB(255, 200, 0), hover = Color3.fromRGB(255, 230, 80)},
+    music = {text = "♪", color = Color3.fromRGB(200, 100, 200), hover = Color3.fromRGB(240, 140, 240)},
+    game = {text = "🎮", color = Color3.fromRGB(100, 200, 100), hover = Color3.fromRGB(140, 240, 140)},
+    phone = {text = "📱", color = Color3.fromRGB(80, 150, 200), hover = Color3.fromRGB(120, 190, 240)},
+    mail = {text = "✉", color = Color3.fromRGB(200, 150, 100), hover = Color3.fromRGB(240, 190, 140)},
+    cloud = {text = "☁", color = Color3.fromRGB(200, 200, 255), hover = Color3.fromRGB(230, 230, 255)},
+    sun = {text = "☀", color = Color3.fromRGB(255, 200, 0), hover = Color3.fromRGB(255, 240, 100)},
+    moon = {text = "☾", color = Color3.fromRGB(150, 150, 200), hover = Color3.fromRGB(190, 190, 240)},
+    drop = {text = "💧", color = Color3.fromRGB(80, 150, 255), hover = Color3.fromRGB(120, 190, 255)},
+    leaf = {text = "🍃", color = Color3.fromRGB(80, 200, 80), hover = Color3.fromRGB(120, 240, 120)},
+    flower = {text = "🌸", color = Color3.fromRGB(255, 150, 200), hover = Color3.fromRGB(255, 190, 230)},
+    cat = {text = "🐱", color = Color3.fromRGB(200, 150, 100), hover = Color3.fromRGB(240, 190, 140)},
+    dog = {text = "🐶", color = Color3.fromRGB(150, 100, 50), hover = Color3.fromRGB(190, 140, 90)},
+    fish = {text = "🐟", color = Color3.fromRGB(80, 150, 200), hover = Color3.fromRGB(120, 190, 240)},
+    bird = {text = "🐦", color = Color3.fromRGB(100, 150, 200), hover = Color3.fromRGB(140, 190, 240)},
+    dragon = {text = "🐉", color = Color3.fromRGB(200, 100, 0), hover = Color3.fromRGB(240, 140, 40)},
+    alien = {text = "👽", color = Color3.fromRGB(80, 200, 80), hover = Color3.fromRGB(120, 240, 120)},
+    robot = {text = "🤖", color = Color3.fromRGB(150, 150, 150), hover = Color3.fromRGB(200, 200, 200)},
+    clown = {text = "🤡", color = Color3.fromRGB(255, 100, 100), hover = Color3.fromRGB(255, 140, 140)},
+    devil = {text = "👿", color = Color3.fromRGB(200, 0, 0), hover = Color3.fromRGB(255, 50, 50)},
+    angel = {text = "👼", color = Color3.fromRGB(255, 255, 200), hover = Color3.fromRGB(255, 255, 230)},
+    santa = {text = "🎅", color = Color3.fromRGB(255, 100, 100), hover = Color3.fromRGB(255, 140, 140)},
+    pumpkin = {text = "🎃", color = Color3.fromRGB(255, 150, 0), hover = Color3.fromRGB(255, 190, 50)},
+    gift = {text = "🎁", color = Color3.fromRGB(200, 100, 100), hover = Color3.fromRGB(240, 140, 140)},
+    cake = {text = "🍰", color = Color3.fromRGB(255, 200, 150), hover = Color3.fromRGB(255, 230, 190)},
+    pizza = {text = "🍕", color = Color3.fromRGB(200, 100, 0), hover = Color3.fromRGB(240, 140, 40)},
+    burger = {text = "🍔", color = Color3.fromRGB(150, 100, 50), hover = Color3.fromRGB(190, 140, 90)},
+    fries = {text = "🍟", color = Color3.fromRGB(255, 200, 0), hover = Color3.fromRGB(255, 240, 80)},
+    coffee = {text = "☕", color = Color3.fromRGB(150, 100, 50), hover = Color3.fromRGB(190, 140, 90)},
+    beer = {text = "🍺", color = Color3.fromRGB(255, 200, 100), hover = Color3.fromRGB(255, 230, 140)},
+    wine = {text = "🍷", color = Color3.fromRGB(200, 50, 50), hover = Color3.fromRGB(240, 90, 90)},
+    cocktail = {text = "🍸", color = Color3.fromRGB(255, 150, 200), hover = Color3.fromRGB(255, 190, 230)},
+    sushi = {text = "🍣", color = Color3.fromRGB(200, 150, 150), hover = Color3.fromRGB(240, 190, 190)},
+    ramen = {text = "🍜", color = Color3.fromRGB(200, 150, 100), hover = Color3.fromRGB(240, 190, 140)}
+}
+
 local function showWatermark()
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "YUUGLR_Watermark"
@@ -15,22 +74,22 @@ local function showWatermark()
     ScreenGui.Parent = player:WaitForChild("PlayerGui")
     
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 220, 0, 60)
-    frame.Position = UDim2.new(0.5, -110, 0, -100)
-    frame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    frame.Size = UDim2.new(0, 250, 0, 70)
+    frame.Position = UDim2.new(0.5, -125, 0, -100)
+    frame.BackgroundColor3 = Color3.fromRGB(5, 5, 10)
     frame.BackgroundTransparency = 0.1
     frame.BorderSizePixel = 0
     frame.Parent = ScreenGui
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 20)
+    corner.CornerRadius = UDim.new(0, 25)
     corner.Parent = frame
     
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 0, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 0, 255)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(120, 0, 200)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 0, 150))
     })
     gradient.Rotation = 45
     gradient.Parent = frame
@@ -43,7 +102,7 @@ local function showWatermark()
     outline.Parent = frame
     
     local outlineCorner = Instance.new("UICorner")
-    outlineCorner.CornerRadius = UDim.new(0, 22)
+    outlineCorner.CornerRadius = UDim.new(0, 27)
     outlineCorner.Parent = outline
     
     local outlineGradient = Instance.new("UIGradient")
@@ -54,37 +113,47 @@ local function showWatermark()
     outlineGradient.Rotation = 45
     outlineGradient.Parent = outline
     
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -20, 1, 0)
-    label.Position = UDim2.new(0, 10, 0, 0)
-    label.BackgroundTransparency = 1
-    label.Text = "YUUGLR by YUUGTRELDYS"
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.GothamBold
-    label.TextSize = 18
-    label.TextXAlignment = Enum.TextXAlignment.Center
-    label.Parent = frame
+    local icon = Instance.new("TextLabel")
+    icon.Size = UDim2.new(0, 50, 1, 0)
+    icon.Position = UDim2.new(0, 10, 0, 0)
+    icon.BackgroundTransparency = 1
+    icon.Text = "⚡"
+    icon.TextColor3 = Color3.fromRGB(255, 255, 255)
+    icon.Font = Enum.Font.GothamBold
+    icon.TextSize = 40
+    icon.Parent = frame
     
-    local glow = Instance.new("ImageLabel")
-    glow.Size = UDim2.new(1, 40, 1, 40)
-    glow.Position = UDim2.new(0, -20, 0, -20)
-    glow.BackgroundTransparency = 1
-    glow.Image = "rbxassetid://5025667723"
-    glow.ImageColor3 = Color3.fromRGB(255, 0, 255)
-    glow.ImageTransparency = 0.7
-    glow.ScaleType = Enum.ScaleType.Slice
-    glow.SliceCenter = Rect.new(20, 20, 20, 20)
-    glow.Parent = frame
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -80, 0, 35)
+    title.Position = UDim2.new(0, 70, 0, 10)
+    title.BackgroundTransparency = 1
+    title.Text = "YUUGLR LIBRARY"
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 22
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = frame
     
-    local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-    local goal = {Position = UDim2.new(0.5, -110, 0, 30)}
+    local subtitle = Instance.new("TextLabel")
+    subtitle.Size = UDim2.new(1, -80, 0, 20)
+    subtitle.Position = UDim2.new(0, 70, 0, 40)
+    subtitle.BackgroundTransparency = 1
+    subtitle.Text = "by YUUGTRELDYS"
+    subtitle.TextColor3 = Color3.fromRGB(200, 150, 255)
+    subtitle.Font = Enum.Font.Gotham
+    subtitle.TextSize = 14
+    subtitle.TextXAlignment = Enum.TextXAlignment.Left
+    subtitle.Parent = frame
+    
+    local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Expo, Enum.EasingDirection.Out)
+    local goal = {Position = UDim2.new(0.5, -125, 0, 30)}
     local tween = tweenService:Create(frame, tweenInfo, goal)
     tween:Play()
     
     task.wait(2)
     
-    local tweenInfo2 = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-    local goal2 = {Position = UDim2.new(0.5, -110, 0, -100)}
+    local tweenInfo2 = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+    local goal2 = {Position = UDim2.new(0.5, -125, 0, -100)}
     local tween2 = tweenService:Create(frame, tweenInfo2, goal2)
     tween2:Play()
     tween2.Completed:Connect(function()
@@ -94,7 +163,10 @@ end
 
 showWatermark()
 
-function YUUGLR:CreateWindow(title, credits, size)
+function YUUGLR:CreateWindow(title, credits, size, closeStyle)
+    closeStyle = closeStyle or "classic"
+    local style = closeStyles[closeStyle] or closeStyles.classic
+    
     size = size or (isMobile and UDim2.new(0, 280, 0, 320) or UDim2.new(0, 400, 0, 450))
     
     local ScreenGui = Instance.new("ScreenGui")
@@ -106,14 +178,16 @@ function YUUGLR:CreateWindow(title, credits, size)
     
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
-    MainFrame.Size = size
-    MainFrame.Position = UDim2.new(0.5, -size.X.Offset/2, 0.5, -size.Y.Offset/2)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    MainFrame.Size = UDim2.new(0, 0, 0, 0)
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(8, 8, 12)
     MainFrame.BorderSizePixel = 0
     MainFrame.Active = true
     MainFrame.Draggable = true
     MainFrame.ClipsDescendants = true
     MainFrame.Parent = ScreenGui
+    
+    tweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Expo, Enum.EasingDirection.Out), {Size = size, Position = UDim2.new(0.5, -size.X.Offset/2, 0.5, -size.Y.Offset/2)}):Play()
     
     local BackgroundGradient = Instance.new("UIGradient")
     BackgroundGradient.Color = ColorSequence.new({
@@ -140,28 +214,17 @@ function YUUGLR:CreateWindow(title, credits, size)
     
     local OutlineGradient = Instance.new("UIGradient")
     OutlineGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 0, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 0, 255)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(120, 0, 200)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 0, 150))
     })
     OutlineGradient.Rotation = 45
     OutlineGradient.Parent = Outline
     
-    local Glow = Instance.new("ImageLabel")
-    Glow.Size = UDim2.new(1, 40, 1, 40)
-    Glow.Position = UDim2.new(0, -20, 0, -20)
-    Glow.BackgroundTransparency = 1
-    Glow.Image = "rbxassetid://5025667723"
-    Glow.ImageColor3 = Color3.fromRGB(255, 0, 255)
-    Glow.ImageTransparency = 0.8
-    Glow.ScaleType = Enum.ScaleType.Slice
-    Glow.SliceCenter = Rect.new(20, 20, 20, 20)
-    Glow.Parent = MainFrame
-    
     local Header = Instance.new("Frame")
     Header.Name = "Header"
     Header.Size = UDim2.new(1, 0, 0, isMobile and 40 or 50)
-    Header.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    Header.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
     Header.BorderSizePixel = 0
     Header.Parent = MainFrame
     
@@ -171,8 +234,8 @@ function YUUGLR:CreateWindow(title, credits, size)
     
     local HeaderGradient = Instance.new("UIGradient")
     HeaderGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 45)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 15, 25))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 25, 40)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 20))
     })
     HeaderGradient.Rotation = 45
     HeaderGradient.Parent = Header
@@ -207,7 +270,7 @@ function YUUGLR:CreateWindow(title, credits, size)
     YUUGLRLabel.Position = UDim2.new(1, -85, 0, 0)
     YUUGLRLabel.BackgroundTransparency = 1
     YUUGLRLabel.Text = "YUUGLR"
-    YUUGLRLabel.TextColor3 = Color3.fromRGB(255, 0, 255)
+    YUUGLRLabel.TextColor3 = Color3.fromRGB(180, 0, 255)
     YUUGLRLabel.Font = Enum.Font.GothamBold
     YUUGLRLabel.TextSize = isMobile and 12 or 14
     YUUGLRLabel.TextXAlignment = Enum.TextXAlignment.Right
@@ -217,8 +280,8 @@ function YUUGLR:CreateWindow(title, credits, size)
     CloseButton.Name = "CloseButton"
     CloseButton.Size = UDim2.new(0, isMobile and 30 or 35, 0, isMobile and 30 or 35)
     CloseButton.Position = UDim2.new(1, isMobile and -35 or -40, 0.5, -17.5)
-    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-    CloseButton.Text = "✕"
+    CloseButton.BackgroundColor3 = style.color
+    CloseButton.Text = style.text
     CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     CloseButton.Font = Enum.Font.GothamBold
     CloseButton.TextSize = isMobile and 16 or 20
@@ -228,27 +291,38 @@ function YUUGLR:CreateWindow(title, credits, size)
     CloseCorner.CornerRadius = UDim.new(0, 10)
     CloseCorner.Parent = CloseButton
     
+    CloseButton.MouseEnter:Connect(function()
+        tweenService:Create(CloseButton, TweenInfo.new(0.2), {BackgroundColor3 = style.hover}):Play()
+        tweenService:Create(CloseButton, TweenInfo.new(0.2), {Size = UDim2.new(0, (isMobile and 32 or 37), 0, (isMobile and 32 or 37))}):Play()
+    end)
+    
+    CloseButton.MouseLeave:Connect(function()
+        tweenService:Create(CloseButton, TweenInfo.new(0.2), {BackgroundColor3 = style.color}):Play()
+        tweenService:Create(CloseButton, TweenInfo.new(0.2), {Size = UDim2.new(0, isMobile and 30 or 35, 0, isMobile and 30 or 35)}):Play()
+    end)
+    
     CloseButton.MouseButton1Click:Connect(function()
-        local tween = tweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)})
-        tween:Play()
-        tween.Completed:Connect(function()
-            ScreenGui:Destroy()
-        end)
+        tweenService:Create(MainFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+        task.wait(0.2)
+        ScreenGui:Destroy()
     end)
     
     return ScreenGui, MainFrame, Header
 end
 
-function YUUGLR:CreateButton(parent, text, position, size, color, callback)
+function YUUGLR:CreateButton(parent, text, position, size, color, callback, icon)
     size = size or UDim2.new(1, -20, 0, isMobile and 35 or 40)
     position = position or UDim2.new(0, 10, 0, 0)
-    color = color or Color3.fromRGB(80, 100, 220)
+    color = color or Color3.fromRGB(100, 80, 220)
+    icon = icon or "▶"
+    
+    local darkerColor = Color3.new(color.R * 0.7, color.G * 0.7, color.B * 0.7)
     
     local button = Instance.new("TextButton")
     button.Name = text .. "Button"
     button.Size = size
     button.Position = position
-    button.BackgroundColor3 = color
+    button.BackgroundColor3 = darkerColor
     button.Text = ""
     button.AutoButtonColor = false
     button.Parent = parent
@@ -259,8 +333,8 @@ function YUUGLR:CreateButton(parent, text, position, size, color, callback)
     
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(math.min(color.R * 255 + 30, 255), math.min(color.G * 255 + 30, 255), math.min(color.B * 255 + 30, 255))),
-        ColorSequenceKeypoint.new(1, color)
+        ColorSequenceKeypoint.new(0, color),
+        ColorSequenceKeypoint.new(1, darkerColor)
     })
     gradient.Rotation = 90
     gradient.Parent = button
@@ -285,8 +359,8 @@ function YUUGLR:CreateButton(parent, text, position, size, color, callback)
     outlineGradient.Parent = outline
     
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -20, 1, 0)
-    label.Position = UDim2.new(0, 10, 0, 0)
+    label.Size = UDim2.new(1, -40, 1, 0)
+    label.Position = UDim2.new(0, 30, 0, 0)
     label.BackgroundTransparency = 1
     label.Text = text
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -295,17 +369,16 @@ function YUUGLR:CreateButton(parent, text, position, size, color, callback)
     label.TextXAlignment = Enum.TextXAlignment.Center
     label.Parent = button
     
-    local icon = Instance.new("TextLabel")
-    icon.Size = UDim2.new(0, 20, 1, 0)
-    icon.Position = UDim2.new(0, 5, 0, 0)
-    icon.BackgroundTransparency = 1
-    icon.Text = "▶"
-    icon.TextColor3 = Color3.fromRGB(255, 255, 255)
-    icon.Font = Enum.Font.GothamBold
-    icon.TextSize = isMobile and 14 or 16
-    icon.TextXAlignment = Enum.TextXAlignment.Left
-    icon.Parent = button
-    icon.Visible = false
+    local iconLabel = Instance.new("TextLabel")
+    iconLabel.Size = UDim2.new(0, 25, 1, 0)
+    iconLabel.Position = UDim2.new(0, 5, 0, 0)
+    iconLabel.BackgroundTransparency = 1
+    iconLabel.Text = icon
+    iconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    iconLabel.Font = Enum.Font.GothamBold
+    iconLabel.TextSize = isMobile and 16 or 18
+    iconLabel.TextXAlignment = Enum.TextXAlignment.Left
+    iconLabel.Parent = button
     
     local shine = Instance.new("Frame")
     shine.Size = UDim2.new(0, 0, 1, 0)
@@ -319,69 +392,106 @@ function YUUGLR:CreateButton(parent, text, position, size, color, callback)
     shineCorner.Parent = shine
     
     local function animateShine()
-        shine:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
-        task.wait(0.1)
-        shine:TweenSize(UDim2.new(0, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3)
+        shine:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2, true)
+        task.wait(0.05)
+        shine:TweenSize(UDim2.new(0, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.2)
     end
     
     button.MouseEnter:Connect(function()
-        tweenService:Create(button, TweenInfo.new(0.2), {Size = UDim2.new(size.X.Scale, size.X.Offset + 2, size.Y.Scale, size.Y.Offset + 2)}):Play()
-        tweenService:Create(label, TweenInfo.new(0.2), {TextSize = (isMobile and 12 or 14) + 1}):Play()
-        icon.Visible = true
+        tweenService:Create(button, TweenInfo.new(0.15, Enum.EasingStyle.Expo, Enum.EasingDirection.Out), {Size = UDim2.new(size.X.Scale, size.X.Offset + 2, size.Y.Scale, size.Y.Offset + 2)}):Play()
+        tweenService:Create(label, TweenInfo.new(0.15), {TextSize = (isMobile and 12 or 14) + 1}):Play()
     end)
     
     button.MouseLeave:Connect(function()
-        tweenService:Create(button, TweenInfo.new(0.2), {Size = size}):Play()
-        tweenService:Create(label, TweenInfo.new(0.2), {TextSize = isMobile and 12 or 14}):Play()
-        icon.Visible = false
+        tweenService:Create(button, TweenInfo.new(0.15, Enum.EasingStyle.Expo, Enum.EasingDirection.Out), {Size = size}):Play()
+        tweenService:Create(label, TweenInfo.new(0.15), {TextSize = isMobile and 12 or 14}):Play()
     end)
     
-    button.MouseButton1Click:Connect(function()
+    button.MouseButton1Down:Connect(function()
+        tweenService:Create(button, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.new(darkerColor.R * 0.7, darkerColor.G * 0.7, darkerColor.B * 0.7)}):Play()
+        tweenService:Create(button, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = UDim2.new(size.X.Scale, size.X.Offset - 4, size.Y.Scale, size.Y.Offset - 4)}):Play()
+    end)
+    
+    button.MouseButton1Up:Connect(function()
+        tweenService:Create(button, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = darkerColor}):Play()
+        tweenService:Create(button, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = size}):Play()
         animateShine()
-        
-        local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        tweenService:Create(button, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 180, 80)}):Play()
-        tweenService:Create(button, tweenInfo, {Size = UDim2.new(size.X.Scale, size.X.Offset - 4, size.Y.Scale, size.Y.Offset - 4)}):Play()
-        
-        task.wait(0.1)
-        
-        tweenService:Create(button, tweenInfo, {BackgroundColor3 = color}):Play()
-        tweenService:Create(button, tweenInfo, {Size = size}):Play()
-        
         if callback then callback() end
     end)
     
     return button
 end
 
-function YUUGLR:CreateLabel(parent, text, position, size, color)
-    size = size or UDim2.new(1, -20, 0, isMobile and 25 or 30)
+function YUUGLR:CreateLabel(parent, text, position, size, color, icon)
+    size = size or UDim2.new(1, -20, 0, isMobile and 30 or 35)
     position = position or UDim2.new(0, 10, 0, 0)
-    color = color or Color3.fromRGB(200, 200, 220)
+    color = color or Color3.fromRGB(220, 220, 255)
+    icon = icon or "📌"
+    
+    local frame = Instance.new("Frame")
+    frame.Size = size
+    frame.Position = position
+    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+    frame.BackgroundTransparency = 0.3
+    frame.BorderSizePixel = 0
+    frame.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = frame
+    
+    local iconLabel = Instance.new("TextLabel")
+    iconLabel.Size = UDim2.new(0, 25, 1, 0)
+    iconLabel.Position = UDim2.new(0, 5, 0, 0)
+    iconLabel.BackgroundTransparency = 1
+    iconLabel.Text = icon
+    iconLabel.TextColor3 = color
+    iconLabel.Font = Enum.Font.GothamBold
+    iconLabel.TextSize = isMobile and 16 or 18
+    iconLabel.TextXAlignment = Enum.TextXAlignment.Left
+    iconLabel.Parent = frame
     
     local label = Instance.new("TextLabel")
-    label.Size = size
-    label.Position = position
+    label.Size = UDim2.new(1, -35, 1, 0)
+    label.Position = UDim2.new(0, 30, 0, 0)
     label.BackgroundTransparency = 1
     label.Text = text
     label.TextColor3 = color
     label.Font = Enum.Font.GothamBold
-    label.TextSize = isMobile and 14 or 16
+    label.TextSize = isMobile and 13 or 15
     label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = parent
+    label.Parent = frame
     
-    return label
+    return frame
 end
 
 function YUUGLR:CreateToggle(parent, text, default, position, callback)
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -20, 0, isMobile and 30 or 35)
+    frame.Size = UDim2.new(1, -20, 0, isMobile and 35 or 40)
     frame.Position = position or UDim2.new(0, 10, 0, 0)
-    frame.BackgroundTransparency = 1
+    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+    frame.BackgroundTransparency = 0.3
+    frame.BorderSizePixel = 0
     frame.Parent = parent
     
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = frame
+    
+    local icon = Instance.new("TextLabel")
+    icon.Size = UDim2.new(0, 25, 1, 0)
+    icon.Position = UDim2.new(0, 5, 0, 0)
+    icon.BackgroundTransparency = 1
+    icon.Text = "⚙"
+    icon.TextColor3 = Color3.fromRGB(200, 200, 255)
+    icon.Font = Enum.Font.GothamBold
+    icon.TextSize = isMobile and 16 or 18
+    icon.TextXAlignment = Enum.TextXAlignment.Left
+    icon.Parent = frame
+    
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0.6, 0, 1, 0)
+    label.Size = UDim2.new(0.6, -30, 1, 0)
+    label.Position = UDim2.new(0, 30, 0, 0)
     label.BackgroundTransparency = 1
     label.Text = text
     label.TextColor3 = Color3.fromRGB(220, 220, 255)
@@ -392,8 +502,8 @@ function YUUGLR:CreateToggle(parent, text, default, position, callback)
     
     local toggleBg = Instance.new("Frame")
     toggleBg.Size = UDim2.new(0, isMobile and 50 or 60, 0, isMobile and 25 or 30)
-    toggleBg.Position = UDim2.new(1, -60, 0.5, -15)
-    toggleBg.BackgroundColor3 = default and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(60, 60, 80)
+    toggleBg.Position = UDim2.new(1, -65, 0.5, -15)
+    toggleBg.BackgroundColor3 = default and Color3.fromRGB(80, 200, 100) or Color3.fromRGB(50, 50, 70)
     toggleBg.BorderSizePixel = 0
     toggleBg.Parent = frame
     
@@ -423,18 +533,18 @@ function YUUGLR:CreateToggle(parent, text, default, position, callback)
     button.MouseButton1Click:Connect(function()
         state = not state
         
-        local targetColor = state and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(60, 60, 80)
+        local targetColor = state and Color3.fromRGB(80, 200, 100) or Color3.fromRGB(50, 50, 70)
         local targetPos = state and UDim2.new(1, -28, 0.5, -14) or UDim2.new(0, 2, 0.5, -14)
         
-        tweenService:Create(toggleBg, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
-        tweenService:Create(toggleButton, TweenInfo.new(0.2), {Position = targetPos}):Play()
+        tweenService:Create(toggleBg, TweenInfo.new(0.15, Enum.EasingStyle.Expo, Enum.EasingDirection.Out), {BackgroundColor3 = targetColor}):Play()
+        tweenService:Create(toggleButton, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = targetPos}):Play()
         
         if callback then callback(state) end
     end)
     
     return frame, function() return state end, function(newState)
         state = newState
-        local targetColor = state and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(60, 60, 80)
+        local targetColor = state and Color3.fromRGB(80, 200, 100) or Color3.fromRGB(50, 50, 70)
         local targetPos = state and UDim2.new(1, -28, 0.5, -14) or UDim2.new(0, 2, 0.5, -14)
         
         toggleBg.BackgroundColor3 = targetColor
@@ -442,32 +552,51 @@ function YUUGLR:CreateToggle(parent, text, default, position, callback)
     end
 end
 
-function YUUGLR:CreateSlider(parent, text, default, min, max, position, callback)
+function YUUGLR:CreateSlider(parent, text, default, min, max, position, callback, icon)
     min = min or 0
     max = max or 100
     default = default or 0
+    icon = icon or "🎚"
     
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(1, -20, 0, isMobile and 55 or 65)
+    frame.Size = UDim2.new(1, -20, 0, isMobile and 65 or 75)
     frame.Position = position or UDim2.new(0, 10, 0, 0)
-    frame.BackgroundTransparency = 1
+    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+    frame.BackgroundTransparency = 0.3
+    frame.BorderSizePixel = 0
     frame.Parent = parent
     
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = frame
+    
+    local iconLabel = Instance.new("TextLabel")
+    iconLabel.Size = UDim2.new(0, 25, 0, 25)
+    iconLabel.Position = UDim2.new(0, 5, 0, 5)
+    iconLabel.BackgroundTransparency = 1
+    iconLabel.Text = icon
+    iconLabel.TextColor3 = Color3.fromRGB(200, 200, 255)
+    iconLabel.Font = Enum.Font.GothamBold
+    iconLabel.TextSize = isMobile and 18 or 20
+    iconLabel.TextXAlignment = Enum.TextXAlignment.Left
+    iconLabel.Parent = frame
+    
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, isMobile and 20 or 25)
+    label.Size = UDim2.new(1, -35, 0, 25)
+    label.Position = UDim2.new(0, 30, 0, 5)
     label.BackgroundTransparency = 1
     label.Text = text .. ": " .. default
     label.TextColor3 = Color3.fromRGB(220, 220, 255)
     label.Font = Enum.Font.GothamBold
-    label.TextSize = isMobile and 13 or 15
+    label.TextSize = isMobile and 14 or 16
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Parent = frame
     
     local slider = Instance.new("Frame")
     slider.Name = "Slider"
-    slider.Size = UDim2.new(1, 0, 0, isMobile and 20 or 25)
-    slider.Position = UDim2.new(0, 0, 0, isMobile and 25 or 30)
-    slider.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    slider.Size = UDim2.new(1, -40, 0, isMobile and 20 or 25)
+    slider.Position = UDim2.new(0, 20, 0, isMobile and 35 or 40)
+    slider.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
     slider.BorderSizePixel = 0
     slider.Parent = frame
     
@@ -478,7 +607,7 @@ function YUUGLR:CreateSlider(parent, text, default, min, max, position, callback
     local fill = Instance.new("Frame")
     fill.Name = "Fill"
     fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-    fill.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+    fill.BackgroundColor3 = Color3.fromRGB(120, 80, 255)
     fill.BorderSizePixel = 0
     fill.Parent = slider
     
@@ -489,21 +618,21 @@ function YUUGLR:CreateSlider(parent, text, default, min, max, position, callback
     local fillGradient = Instance.new("UIGradient")
     fillGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(150, 100, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 150, 255))
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 80, 255))
     })
     fillGradient.Rotation = 90
     fillGradient.Parent = fill
     
     local dragButton = Instance.new("TextButton")
-    dragButton.Size = UDim2.new(0, isMobile and 24 or 28, 0, isMobile and 24 or 28)
-    dragButton.Position = UDim2.new((default - min) / (max - min), -12, 0.5, -12)
+    dragButton.Size = UDim2.new(0, isMobile and 26 or 30, 0, isMobile and 26 or 30)
+    dragButton.Position = UDim2.new((default - min) / (max - min), -13, 0.5, -13)
     dragButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     dragButton.Text = ""
     dragButton.BorderSizePixel = 0
     dragButton.Parent = slider
     
     local dragCorner = Instance.new("UICorner")
-    dragCorner.CornerRadius = UDim.new(0, 14)
+    dragCorner.CornerRadius = UDim.new(0, 15)
     dragCorner.Parent = dragButton
     
     local dragOutline = Instance.new("Frame")
@@ -514,13 +643,13 @@ function YUUGLR:CreateSlider(parent, text, default, min, max, position, callback
     dragOutline.Parent = dragButton
     
     local dragOutlineCorner = Instance.new("UICorner")
-    dragOutlineCorner.CornerRadius = UDim.new(0, 15)
+    dragOutlineCorner.CornerRadius = UDim.new(0, 16)
     dragOutlineCorner.Parent = dragOutline
     
     local dragOutlineGradient = Instance.new("UIGradient")
     dragOutlineGradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(150, 100, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 150, 255))
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 80, 255))
     })
     dragOutlineGradient.Rotation = 90
     dragOutlineGradient.Parent = dragOutline
@@ -547,8 +676,8 @@ function YUUGLR:CreateSlider(parent, text, default, min, max, position, callback
             local newValue = math.floor(min + (relativePos * (max - min)) + 0.5)
             value = newValue
             
-            fill.Size = UDim2.new(relativePos, 0, 1, 0)
-            dragButton.Position = UDim2.new(relativePos, -12, 0.5, -12)
+            fill:TweenSize(UDim2.new(relativePos, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Expo, 0.1, true)
+            dragButton:TweenPosition(UDim2.new(relativePos, -13, 0.5, -13), Enum.EasingDirection.Out, Enum.EasingStyle.Expo, 0.1, true)
             label.Text = text .. ": " .. value
             if callback then callback(value) end
         end
@@ -557,14 +686,14 @@ function YUUGLR:CreateSlider(parent, text, default, min, max, position, callback
     return frame, function() return value end, function(newValue)
         value = newValue
         local relativePos = (value - min) / (max - min)
-        fill.Size = UDim2.new(relativePos, 0, 1, 0)
-        dragButton.Position = UDim2.new(relativePos, -12, 0.5, -12)
+        fill:TweenSize(UDim2.new(relativePos, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Expo, 0.2, true)
+        dragButton:TweenPosition(UDim2.new(relativePos, -13, 0.5, -13), Enum.EasingDirection.Out, Enum.EasingStyle.Expo, 0.2, true)
         label.Text = text .. ": " .. value
     end
 end
 
 function YUUGLR:CreateScrollingFrame(parent, size, position)
-    size = size or UDim2.new(1, -20, 1, -70)
+    size = size or UDim2.new(1, -20, 1, -80)
     position = position or UDim2.new(0, 10, 0, 60)
     
     local frame = Instance.new("ScrollingFrame")
@@ -572,24 +701,52 @@ function YUUGLR:CreateScrollingFrame(parent, size, position)
     frame.Position = position
     frame.BackgroundTransparency = 1
     frame.BorderSizePixel = 0
-    frame.ScrollBarThickness = 6
-    frame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 255)
+    frame.ScrollBarThickness = 4
+    frame.ScrollBarImageColor3 = Color3.fromRGB(150, 100, 255)
     frame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    frame.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
     frame.Parent = parent
     
     local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, isMobile and 8 or 10)
+    layout.Padding = UDim.new(0, isMobile and 6 or 8)
     layout.Parent = frame
     
     layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        frame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 20)
+        frame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 15)
     end)
     
     return frame, layout
 end
 
-function YUUGLR:CreateNotification(text, duration)
-    duration = duration or 3
+function YUUGLR:CreateTab(parent, buttons)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -20, 0, isMobile and 140 or 180)
+    frame.Position = UDim2.new(0, 10, 1, isMobile and -150 or -190)
+    frame.BackgroundTransparency = 1
+    frame.Parent = parent
+    
+    local yPos = 0
+    for i, btn in ipairs(buttons) do
+        self:CreateButton(frame, btn.text, UDim2.new(0, 0, 0, yPos), btn.size, btn.color, btn.callback, btn.icon)
+        yPos = yPos + (isMobile and 40 or 45)
+    end
+    
+    return frame
+end
+
+function YUUGLR:CreateNotification(text, duration, type)
+    duration = duration or 2.5
+    type = type or "info"
+    
+    local colors = {
+        info = {Color3.fromRGB(120, 80, 255), "ℹ"},
+        success = {Color3.fromRGB(80, 200, 100), "✓"},
+        error = {Color3.fromRGB(200, 80, 80), "✗"},
+        warning = {Color3.fromRGB(255, 180, 80), "⚠"}
+    }
+    
+    local color = colors[type][1]
+    local icon = colors[type][2]
     
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "YUUGLR_Notification"
@@ -601,7 +758,7 @@ function YUUGLR:CreateNotification(text, duration)
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 350, 0, 80)
     frame.Position = UDim2.new(0.5, -175, 0, -100)
-    frame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    frame.BackgroundColor3 = Color3.fromRGB(8, 8, 12)
     frame.BackgroundTransparency = 0.1
     frame.BorderSizePixel = 0
     frame.ClipsDescendants = true
@@ -613,9 +770,9 @@ function YUUGLR:CreateNotification(text, duration)
     
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
-        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 0, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+        ColorSequenceKeypoint.new(0, color),
+        ColorSequenceKeypoint.new(0.5, Color3.new(color.R * 0.7, color.G * 0.7, color.B * 0.7)),
+        ColorSequenceKeypoint.new(1, Color3.new(color.R * 0.5, color.G * 0.5, color.B * 0.5))
     })
     gradient.Rotation = 45
     gradient.Parent = frame
@@ -633,36 +790,36 @@ function YUUGLR:CreateNotification(text, duration)
     
     local outlineGradient = Instance.new("UIGradient")
     outlineGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+        ColorSequenceKeypoint.new(0, color),
+        ColorSequenceKeypoint.new(1, Color3.new(color.R * 0.5, color.G * 0.5, color.B * 0.5))
     })
     outlineGradient.Rotation = 45
     outlineGradient.Parent = outline
     
-    local icon = Instance.new("TextLabel")
-    icon.Size = UDim2.new(0, 40, 1, 0)
-    icon.Position = UDim2.new(0, 10, 0, 0)
-    icon.BackgroundTransparency = 1
-    icon.Text = "⚡"
-    icon.TextColor3 = Color3.fromRGB(255, 255, 255)
-    icon.Font = Enum.Font.GothamBold
-    icon.TextSize = 40
-    icon.Parent = frame
+    local iconLabel = Instance.new("TextLabel")
+    iconLabel.Size = UDim2.new(0, 50, 1, 0)
+    iconLabel.Position = UDim2.new(0, 10, 0, 0)
+    iconLabel.BackgroundTransparency = 1
+    iconLabel.Text = icon
+    iconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    iconLabel.Font = Enum.Font.GothamBold
+    iconLabel.TextSize = 40
+    iconLabel.Parent = frame
     
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, -70, 0, 30)
-    title.Position = UDim2.new(0, 60, 0, 10)
+    title.Size = UDim2.new(1, -80, 0, 30)
+    title.Position = UDim2.new(0, 70, 0, 10)
     title.BackgroundTransparency = 1
-    title.Text = "YUUGLR"
+    title.Text = "YUUGLR LIBRARY"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.Font = Enum.Font.GothamBold
-    title.TextSize = 24
+    title.TextSize = 20
     title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = frame
     
     local message = Instance.new("TextLabel")
-    message.Size = UDim2.new(1, -70, 0, 30)
-    message.Position = UDim2.new(0, 60, 0, 40)
+    message.Size = UDim2.new(1, -80, 0, 30)
+    message.Position = UDim2.new(0, 70, 0, 40)
     message.BackgroundTransparency = 1
     message.Text = text
     message.TextColor3 = Color3.fromRGB(220, 220, 255)
@@ -671,20 +828,21 @@ function YUUGLR:CreateNotification(text, duration)
     message.TextXAlignment = Enum.TextXAlignment.Left
     message.Parent = frame
     
-    local tweenInfo = TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-    local goal = {Position = UDim2.new(0.5, -175, 0, 50)}
-    local tween = tweenService:Create(frame, tweenInfo, goal)
-    tween:Play()
+    tweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Expo, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -175, 0, 30)}):Play()
     
     task.wait(duration)
     
-    local tweenInfo2 = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-    local goal2 = {Position = UDim2.new(0.5, -175, 0, -100)}
-    local tween2 = tweenService:Create(frame, tweenInfo2, goal2)
-    tween2:Play()
-    tween2.Completed:Connect(function()
-        ScreenGui:Destroy()
-    end)
+    tweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(0.5, -175, 0, -100)}):Play()
+    task.wait(0.3)
+    ScreenGui:Destroy()
+end
+
+function YUUGLR:GetCloseStyles()
+    local styles = {}
+    for name, _ in pairs(closeStyles) do
+        table.insert(styles, name)
+    end
+    return styles
 end
 
 return YUUGLR
