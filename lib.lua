@@ -64,12 +64,12 @@ local function ApplyButtonStyle(button, color)
             v:Destroy()
         end
     end
-    local darker = Color3.fromRGB(math.max(color.R * 255 - 30, 0), math.max(color.G * 255 - 30, 0), math.max(color.B * 255 - 30, 0))
+    local darker = Color3.fromRGB(math.max(color.R * 255 - 50, 0), math.max(color.G * 255 - 50, 0), math.max(color.B * 255 - 50, 0))
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, color),ColorSequenceKeypoint.new(1, darker)})
     gradient.Rotation = 90
     gradient.Parent = button
-    local brighter = Color3.fromRGB(math.min(color.R * 255 + 40, 255), math.min(color.G * 255 + 40, 255), math.min(color.B * 255 + 40, 255))
+    local brighter = Color3.fromRGB(math.min(color.R * 255 + 70, 255), math.min(color.G * 255 + 70, 255), math.min(color.B * 255 + 70, 255))
     button.TextColor3 = brighter
 end
 
@@ -77,14 +77,14 @@ local function DarkenButton(button)
     if not button:FindFirstChild("UIGradient") then return end
     local gradient = button:FindFirstChild("UIGradient")
     local color = gradient.Color.Keypoints[1].Value
-    local darker = Color3.fromRGB(math.max(color.R * 255 - 50, 0), math.max(color.G * 255 - 50, 0), math.max(color.B * 255 - 50, 0))
+    local darker = Color3.fromRGB(math.max(color.R * 255 - 70, 0), math.max(color.G * 255 - 70, 0), math.max(color.B * 255 - 70, 0))
     gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, darker),ColorSequenceKeypoint.new(1, darker)})
 end
 
 local function RestoreButtonStyle(button, color)
     if not button:FindFirstChild("UIGradient") then return end
     local gradient = button:FindFirstChild("UIGradient")
-    local darker = Color3.fromRGB(math.max(color.R * 255 - 30, 0), math.max(color.G * 255 - 30, 0), math.max(color.B * 255 - 30, 0))
+    local darker = Color3.fromRGB(math.max(color.R * 255 - 50, 0), math.max(color.G * 255 - 50, 0), math.max(color.B * 255 - 50, 0))
     gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, color),ColorSequenceKeypoint.new(1, darker)})
 end
 
@@ -307,7 +307,7 @@ function YUUGTRL:CreateWindow(title)
             Create({type = "UICorner",CornerRadius = UDim.new(0, 6),Parent = ToggleFrame})
             
             local gradient = Instance.new("UIGradient")
-            gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))})
+            gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 100, 120)),ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))})
             gradient.Rotation = 90
             gradient.Parent = ToggleFrame
             
@@ -317,7 +317,7 @@ function YUUGTRL:CreateWindow(title)
                 Position = UDim2.new(0, 10, 0, 0),
                 BackgroundTransparency = 1,
                 Text = text,
-                TextColor3 = Color3.fromRGB(220, 220, 255),
+                TextColor3 = Color3.fromRGB(240, 240, 255),
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
@@ -371,7 +371,7 @@ function YUUGTRL:CreateWindow(title)
             Create({type = "UICorner",CornerRadius = UDim.new(0, 6),Parent = SliderFrame})
             
             local gradient = Instance.new("UIGradient")
-            gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(90, 90, 100)),ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))})
+            gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 100, 120)),ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 70))})
             gradient.Rotation = 90
             gradient.Parent = SliderFrame
             
@@ -381,7 +381,7 @@ function YUUGTRL:CreateWindow(title)
                 Position = UDim2.new(0, 10, 0, 5),
                 BackgroundTransparency = 1,
                 Text = text,
-                TextColor3 = Color3.fromRGB(220, 220, 255),
+                TextColor3 = Color3.fromRGB(240, 240, 255),
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
@@ -394,7 +394,7 @@ function YUUGTRL:CreateWindow(title)
                 Position = UDim2.new(1, -50, 0, 5),
                 BackgroundTransparency = 1,
                 Text = tostring(default or 0),
-                TextColor3 = Color3.fromRGB(200, 200, 255),
+                TextColor3 = Color3.fromRGB(220, 220, 255),
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 Parent = SliderFrame
@@ -454,7 +454,7 @@ function YUUGTRL:CreateWindow(title)
             local lblParent = parent or tabFrame
             local lblSize = size or UDim2.new(1, -10, 0, 30)
             local lblPos = position or UDim2.new(0, 0, 0, 0)
-            local txtColor = color or Color3.fromRGB(200, 200, 255)
+            local txtColor = color or Color3.fromRGB(220, 220, 255)
             
             local Label = Create({
                 type = "TextLabel",
