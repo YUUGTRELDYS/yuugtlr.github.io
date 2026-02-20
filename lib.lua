@@ -239,10 +239,6 @@ function YUUGTRL:CreateWindow(title, size, position)
         if size then instance.Size = size end
     end
     
-    function window:SetSettingsCallback(callback)
-        SettingsBtn.MouseButton1Click:Connect(callback)
-    end
-    
     function window:Destroy()
         ScreenGui:Destroy()
     end
@@ -258,7 +254,7 @@ function YUUGTRL:CreateMonitor(parent, items, position, size)
     local labels = {}
     
     for i, item in pairs(items) do
-        local label = self:CreateLabel(frame, item.name .. ": " .. tostring(item.value), UDim2.new(0, 10, 0, y), UDim2.new(1, -20, 0, 25))
+        local label = self:CreateLabel(frame, item.name .. ": " .. tostring(item.getValue()), UDim2.new(0, 10, 0, y), UDim2.new(1, -20, 0, 25))
         table.insert(labels, {label = label, getName = item.name, getValue = item.getValue})
         y = y + 28
     end
