@@ -28,6 +28,22 @@ local function createTween(object, properties, duration, easingStyle, easingDire
 	)
 end
 
+local function darkenColor(color, percent)
+	return Color3.fromRGB(
+		math.max(color.R * 255 * (1 - percent), 0),
+		math.max(color.G * 255 * (1 - percent), 0),
+		math.max(color.B * 255 * (1 - percent), 0)
+	) / 255
+end
+
+local function lightenColor(color, percent)
+	return Color3.fromRGB(
+		math.min(color.R * 255 * (1 + percent), 255),
+		math.min(color.G * 255 * (1 + percent), 255),
+		math.min(color.B * 255 * (1 + percent), 255)
+	) / 255
+end
+
 local function addGradient(parent, color1, color2, rotation)
 	local gradient = Instance.new("UIGradient")
 	gradient.Color = ColorSequence.new({
@@ -103,7 +119,7 @@ function YUUGTRL:CreateWindow(options)
 	window.Header.BackgroundColor3 = colors.backgroundLight
 	window.Header.BorderSizePixel = 0
 	
-	addGradient(window.Header, Color3.fromRGB(60, 60, 80), Color3.fromRGB(40, 40, 55))
+	addGradient(window.Header, lightenColor(colors.backgroundLight, 0.2), colors.backgroundLight, 90)
 	addCorner(window.Header, 16)
 	
 	local title = Instance.new("TextLabel")
@@ -125,7 +141,7 @@ function YUUGTRL:CreateWindow(options)
 		credit.Position = UDim2.new(0, 12, 1, isMobile and -14 or -16)
 		credit.BackgroundTransparency = 1
 		credit.Text = "YUUGTRL Library v1.0"
-		credit.TextColor3 = Color3.fromRGB(170, 85, 255)
+		credit.TextColor3 = colors.info
 		credit.Font = Enum.Font.Gotham
 		credit.TextSize = isMobile and 9 or 11
 		credit.TextXAlignment = Enum.TextXAlignment.Left
@@ -142,6 +158,7 @@ function YUUGTRL:CreateWindow(options)
 	closeBtn.Font = Enum.Font.GothamBold
 	closeBtn.TextSize = isMobile and 16 or 20
 	
+	addGradient(closeBtn, lightenColor(colors.danger, 0.2), darkenColor(colors.danger, 0.2), 90)
 	addCorner(closeBtn, 8)
 	
 	closeBtn.MouseButton1Click:Connect(function()
@@ -259,6 +276,13 @@ function YUUGTRL:CreateWindow(options)
 			header.TextSize = isMobile and 12 or 14
 			header.TextXAlignment = Enum.TextXAlignment.Left
 			header.Parent = container
+			
+			local line = Instance.new("Frame")
+			line.Size = UDim2.new(1, 0, 0, 1)
+			line.Position = UDim2.new(0, 0, 1, -2)
+			line.BackgroundColor3 = colors.accent
+			line.BorderSizePixel = 0
+			line.Parent = header
 		end
 		
 		section.Frame = container
@@ -299,44 +323,53 @@ function YUUGTRL:CreateWindow(options)
 end
 
 function YUUGTRL:CreateButton(text, callback, color)
+	local buttonColor = color or colors.accent
 	local button = Instance.new("TextButton")
 	button.Size = UDim2.new(1, 0, 0, isMobile and 30 or 35)
-	button.BackgroundColor3 = color or colors.accent
+	button.BackgroundColor3 = buttonColor
 	button.Text = text
 	button.TextColor3 = colors.text
 	button.Font = Enum.Font.GothamBold
 	button.TextSize = isMobile and 11 or 13
 	button.AutoButtonColor = false
 	
-	local gradient = addGradient(button, 
-		Color3.fromRGB(
-			math.min((color or colors.accent).R * 255 + 20, 255),
-			math.min((color or colors.accent).G * 255 + 20, 255),
-			math.min((color or colors.accent).B * 255 + 20, 255)
-		),
-		color or colors.accent,
-		90
-	)
-	
+	addGradient(button, lightenColor(buttonColor, 0.15), darkenColor(buttonColor, 0.2), 90)
 	addCorner(button, 10)
 	
 	button.MouseEnter:Connect(function()
-		createTween(button, {BackgroundColor3 = Color3.fromRGB(
-			math.min((color or colors.accent).R * 255 + 30, 255),
-			math.min((color or colors.accent).G * 255 + 30, 255),
-			math.min((color or colors.accent).B * 255 + 30, 255)
-		)}):Play()
+		createTween(button:FindFirstChildOfClass("UIGradient"), {
+			Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, lightenColor(buttonColor, 0.25)),
+				ColorSequenceKeypoint.new(1, darkenColor(buttonColor, 0.1))
+			})
+		}):Play()
 	end)
 	
 	button.MouseLeave:Connect(function()
-		createTween(button, {BackgroundColor3 = color or colors.accent}):Play()
+		createTween(button:FindFirstChildOfClass("UIGradient"), {
+			Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, lightenColor(buttonColor, 0.15)),
+				ColorSequenceKeypoint.new(1, darkenColor(buttonColor, 0.2))
+			})
+		}):Play()
 	end)
 	
 	button.MouseButton1Click:Connect(function()
-		createTween(button, {BackgroundColor3 = colors.success}):Play()
+		local gradient = button:FindFirstChildOfClass("UIGradient")
+		createTween(gradient, {
+			Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, lightenColor(colors.success, 0.15)),
+				ColorSequenceKeypoint.new(1, darkenColor(colors.success, 0.2))
+			})
+		}):Play()
 		task.wait(0.1)
-		createTween(button, {BackgroundColor3 = color or colors.accent}):Play()
-		if callback then callback() end
+		createTween(gradient, {
+			Color = ColorSequence.new({
+				ColorSequenceKeypoint.new(0, lightenColor(buttonColor, 0.15)),
+				ColorSequenceKeypoint.new(1, darkenColor(buttonColor, 0.2))
+			})
+		}):Play()
+		if callback then callback(button) end
 	end)
 	
 	return button
@@ -435,7 +468,7 @@ function YUUGTRL:CreateSlider(text, min, max, default, callback)
 	valueLabel.Position = UDim2.new(0.55, 0, 0, 0)
 	valueLabel.BackgroundTransparency = 1
 	valueLabel.Text = tostring(default or min or 0)
-	valueLabel.TextColor3 = colors.accent
+	valueLabel.TextColor3 = colors.text
 	valueLabel.Font = Enum.Font.GothamBold
 	valueLabel.TextSize = isMobile and 12 or 14
 	valueLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -448,6 +481,7 @@ function YUUGTRL:CreateSlider(text, min, max, default, callback)
 	sliderBg.BorderSizePixel = 0
 	sliderBg.Parent = frame
 	
+	addGradient(sliderBg, colors.backgroundLight, colors.backgroundDark, 90)
 	addCorner(sliderBg, 10)
 	
 	local sliderFill = Instance.new("Frame")
@@ -457,6 +491,7 @@ function YUUGTRL:CreateSlider(text, min, max, default, callback)
 	sliderFill.BorderSizePixel = 0
 	sliderFill.Parent = sliderBg
 	
+	addGradient(sliderFill, lightenColor(colors.accent, 0.15), darkenColor(colors.accent, 0.2), 90)
 	addCorner(sliderFill, 10)
 	
 	local sliderButton = Instance.new("TextButton")
@@ -466,6 +501,7 @@ function YUUGTRL:CreateSlider(text, min, max, default, callback)
 	sliderButton.BorderSizePixel = 0
 	sliderButton.Parent = sliderBg
 	
+	addGradient(sliderButton, colors.text, darkenColor(colors.text, 0.2), 90)
 	addCorner(sliderButton, 10)
 	
 	local minVal = min or 0
