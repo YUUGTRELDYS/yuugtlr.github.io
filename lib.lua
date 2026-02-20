@@ -44,6 +44,25 @@ tween.Completed:Connect(function()
     splash:Destroy()
 end)
 
+local languages = {}
+local currentLanguage = "English"
+
+function YUUGTRL:AddLanguage(name, translations)
+    languages[name] = translations
+end
+
+function YUUGTRL:ChangeLanguage(lang)
+    if languages[lang] then
+        currentLanguage = lang
+        return true
+    end
+    return false
+end
+
+function YUUGTRL:GetText(key)
+    return languages[currentLanguage] and languages[currentLanguage][key] or key
+end
+
 local function Create(props)
     local obj = Instance.new(props.type)
     for i, v in pairs(props) do
@@ -242,6 +261,10 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return YUUGTRL:CreateFrame(self.Main, size, position, color, radius)
     end
     
+    function window:CreateScrollingFrame(size, position, color, radius)
+        return YUUGTRL:CreateScrollingFrame(self.Main, size, position, color, radius)
+    end
+    
     function window:CreateLabel(text, position, size, color)
         return YUUGTRL:CreateLabel(self.Main, text, position, size, color)
     end
@@ -288,6 +311,28 @@ function YUUGTRL:CreateFrame(parent, size, position, color, radius)
     })
     
     Create({type = "UICorner",CornerRadius = UDim.new(0, radius or 12),Parent = frame})
+    
+    return frame
+end
+
+function YUUGTRL:CreateScrollingFrame(parent, size, position, color, radius)
+    local frame = Instance.new("ScrollingFrame")
+    frame.Size = size or UDim2.new(0, 200, 0, 200)
+    frame.Position = position or UDim2.new(0, 0, 0, 0)
+    frame.BackgroundColor3 = color or Color3.fromRGB(35, 35, 45)
+    frame.BackgroundTransparency = 0
+    frame.BorderSizePixel = 0
+    frame.ScrollBarThickness = 4
+    frame.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 150)
+    frame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    frame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    frame.Parent = parent
+    
+    if radius then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, radius)
+        corner.Parent = frame
+    end
     
     return frame
 end
