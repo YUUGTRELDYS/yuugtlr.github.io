@@ -69,8 +69,9 @@ local function ApplyButtonStyle(button, color)
     gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, color),ColorSequenceKeypoint.new(1, darker)})
     gradient.Rotation = 90
     gradient.Parent = button
-    local brighter = Color3.fromRGB(math.min(color.R * 255 + 70, 255), math.min(color.G * 255 + 70, 255), math.min(color.B * 255 + 70, 255))
+    local brighter = Color3.fromRGB(math.min(color.R * 255 + 100, 255), math.min(color.G * 255 + 100, 255), math.min(color.B * 255 + 100, 255))
     button.TextColor3 = brighter
+    button.Font = Enum.Font.GothamBold
 end
 
 local function DarkenButton(button)
@@ -148,7 +149,6 @@ function YUUGTRL:CreateWindow(title)
     
     Close.MouseButton1Down:Connect(function()DarkenButton(Close)end)
     Close.MouseButton1Up:Connect(function()RestoreButtonStyle(Close, Color3.fromRGB(255, 50, 50))end)
-    Close.MouseLeave:Connect(function()RestoreButtonStyle(Close, Color3.fromRGB(255, 50, 50))end)
     
     local Tabs = Create({
         type = "Frame",
@@ -213,7 +213,7 @@ function YUUGTRL:CreateWindow(title)
             BackgroundColor3 = Color3.fromRGB(50, 50, 60),
             Text = name,
             TextColor3 = Color3.fromRGB(200, 200, 200),
-            Font = Enum.Font.Gotham,
+            Font = Enum.Font.GothamBold,
             TextSize = 14,
             Parent = self.Tabs
         })
@@ -223,7 +223,6 @@ function YUUGTRL:CreateWindow(title)
         
         TabButton.MouseButton1Down:Connect(function()DarkenButton(TabButton)end)
         TabButton.MouseButton1Up:Connect(function()RestoreButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))end)
-        TabButton.MouseLeave:Connect(function()RestoreButtonStyle(TabButton, Color3.fromRGB(50, 50, 60))end)
         
         lastTabPosition = lastTabPosition + 85
         
@@ -271,7 +270,7 @@ function YUUGTRL:CreateWindow(title)
                 BackgroundColor3 = btnColor,
                 Text = text,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
-                Font = Enum.Font.Gotham,
+                Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 Parent = btnParent
             })
@@ -281,7 +280,6 @@ function YUUGTRL:CreateWindow(title)
             
             Button.MouseButton1Down:Connect(function()DarkenButton(Button)end)
             Button.MouseButton1Up:Connect(function()RestoreButtonStyle(Button, btnColor)end)
-            Button.MouseLeave:Connect(function()RestoreButtonStyle(Button, btnColor)end)
             
             Button.MouseButton1Click:Connect(function()
                 local success, err = pcall(callback)
@@ -317,8 +315,8 @@ function YUUGTRL:CreateWindow(title)
                 Position = UDim2.new(0, 10, 0, 0),
                 BackgroundTransparency = 1,
                 Text = text,
-                TextColor3 = Color3.fromRGB(240, 240, 255),
-                Font = Enum.Font.Gotham,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = ToggleFrame
@@ -339,7 +337,6 @@ function YUUGTRL:CreateWindow(title)
             
             ToggleBtn.MouseButton1Down:Connect(function()DarkenButton(ToggleBtn)end)
             ToggleBtn.MouseButton1Up:Connect(function()RestoreButtonStyle(ToggleBtn, toggleColor)end)
-            ToggleBtn.MouseLeave:Connect(function()RestoreButtonStyle(ToggleBtn, toggleColor)end)
             
             local toggled = default or false
             
@@ -381,8 +378,8 @@ function YUUGTRL:CreateWindow(title)
                 Position = UDim2.new(0, 10, 0, 5),
                 BackgroundTransparency = 1,
                 Text = text,
-                TextColor3 = Color3.fromRGB(240, 240, 255),
-                Font = Enum.Font.Gotham,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Parent = SliderFrame
@@ -394,8 +391,8 @@ function YUUGTRL:CreateWindow(title)
                 Position = UDim2.new(1, -50, 0, 5),
                 BackgroundTransparency = 1,
                 Text = tostring(default or 0),
-                TextColor3 = Color3.fromRGB(220, 220, 255),
-                Font = Enum.Font.Gotham,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 Parent = SliderFrame
             })
@@ -454,7 +451,7 @@ function YUUGTRL:CreateWindow(title)
             local lblParent = parent or tabFrame
             local lblSize = size or UDim2.new(1, -10, 0, 30)
             local lblPos = position or UDim2.new(0, 0, 0, 0)
-            local txtColor = color or Color3.fromRGB(220, 220, 255)
+            local txtColor = color or Color3.fromRGB(255, 255, 255)
             
             local Label = Create({
                 type = "TextLabel",
@@ -463,7 +460,7 @@ function YUUGTRL:CreateWindow(title)
                 BackgroundTransparency = 1,
                 Text = text,
                 TextColor3 = txtColor,
-                Font = Enum.Font.Gotham,
+                Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 Parent = lblParent
             })
