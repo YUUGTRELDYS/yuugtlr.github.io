@@ -6,29 +6,25 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local isMobile = UserInputService.TouchEnabled
 
-local isLoading = true
 local windows = {}
-local loadGui = nil
-local loadFrame = nil
-local loadComplete = false
 
-local function showLoadMessage(callback)
-    loadGui = Instance.new("ScreenGui")
-    loadGui.Name = "YUUGTRL_Loader"
-    loadGui.ResetOnSpawn = false
-    loadGui.Parent = player:WaitForChild("PlayerGui")
-    loadGui.IgnoreGuiInset = true
-    loadGui.DisplayOrder = 9999
+local function showLoadMessage()
+    local msgGui = Instance.new("ScreenGui")
+    msgGui.Name = "YUUGTRL_Message"
+    msgGui.ResetOnSpawn = false
+    msgGui.Parent = player:WaitForChild("PlayerGui")
+    msgGui.IgnoreGuiInset = true
+    msgGui.DisplayOrder = 9999
     
-    loadFrame = Instance.new("Frame")
-    loadFrame.Name = "LoadFrame"
-    loadFrame.Size = UDim2.new(0, 300, 0, 120)
-    loadFrame.Position = UDim2.new(0.5, -150, 0.5, -60)
-    loadFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    loadFrame.BorderSizePixel = 0
-    loadFrame.Parent = loadGui
-    loadFrame.Active = true
-    loadFrame.Draggable = true
+    local msgFrame = Instance.new("Frame")
+    msgFrame.Name = "MessageFrame"
+    msgFrame.Size = UDim2.new(0, 200, 0, 50)
+    msgFrame.Position = UDim2.new(0.5, -100, 0.5, -25)
+    msgFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    msgFrame.BorderSizePixel = 0
+    msgFrame.Parent = msgGui
+    msgFrame.Draggable = true
+    msgFrame.Active = true
     
     local shadow = Instance.new("ImageLabel")
     shadow.Name = "Shadow"
@@ -40,11 +36,11 @@ local function showLoadMessage(callback)
     shadow.ImageTransparency = 0.9
     shadow.ScaleType = Enum.ScaleType.Slice
     shadow.SliceCenter = Rect.new(10, 10, 118, 118)
-    shadow.Parent = loadFrame
+    shadow.Parent = msgFrame
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
-    corner.Parent = loadFrame
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = msgFrame
     
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
@@ -52,97 +48,32 @@ local function showLoadMessage(callback)
         ColorSequenceKeypoint.new(1, Color3.fromRGB(25, 25, 35))
     })
     gradient.Rotation = 45
-    gradient.Parent = loadFrame
+    gradient.Parent = msgFrame
     
-    local logo = Instance.new("TextLabel")
-    logo.Name = "Logo"
-    logo.Size = UDim2.new(1, 0, 0, 40)
-    logo.Position = UDim2.new(0, 0, 0, 15)
-    logo.BackgroundTransparency = 1
-    logo.Text = "📚 YUUGTRL"
-    logo.TextColor3 = Color3.fromRGB(170, 85, 255)
-    logo.Font = Enum.Font.GothamBold
-    logo.TextSize = 24
-    logo.Parent = loadFrame
+    local msgText = Instance.new("TextLabel")
+    msgText.Name = "MessageText"
+    msgText.Size = UDim2.new(1, -20, 1, 0)
+    msgText.Position = UDim2.new(0, 10, 0, 0)
+    msgText.BackgroundTransparency = 1
+    msgText.Text = "📚 YUUGTRL"
+    msgText.TextColor3 = Color3.fromRGB(170, 85, 255)
+    msgText.Font = Enum.Font.GothamBold
+    msgText.TextSize = 18
+    msgText.TextXAlignment = Enum.TextXAlignment.Center
+    msgText.Parent = msgFrame
     
-    local status = Instance.new("TextLabel")
-    status.Name = "Status"
-    status.Size = UDim2.new(1, 0, 0, 20)
-    status.Position = UDim2.new(0, 0, 0, 55)
-    status.BackgroundTransparency = 1
-    status.Text = "Loading..."
-    status.TextColor3 = Color3.fromRGB(200, 200, 255)
-    status.Font = Enum.Font.Gotham
-    status.TextSize = 14
-    status.Parent = loadFrame
+    task.wait(2)
     
-    local progressBg = Instance.new("Frame")
-    progressBg.Name = "ProgressBg"
-    progressBg.Size = UDim2.new(0, 260, 0, 6)
-    progressBg.Position = UDim2.new(0.5, -130, 0, 80)
-    progressBg.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-    progressBg.BorderSizePixel = 0
-    progressBg.Parent = loadFrame
-    
-    local progressCorner = Instance.new("UICorner")
-    progressCorner.CornerRadius = UDim.new(0, 3)
-    progressCorner.Parent = progressBg
-    
-    local progressFill = Instance.new("Frame")
-    progressFill.Name = "ProgressFill"
-    progressFill.Size = UDim2.new(0, 0, 1, 0)
-    progressFill.BackgroundColor3 = Color3.fromRGB(80, 100, 220)
-    progressFill.BorderSizePixel = 0
-    progressFill.Parent = progressBg
-    
-    local fillCorner = Instance.new("UICorner")
-    fillCorner.CornerRadius = UDim.new(0, 3)
-    fillCorner.Parent = progressFill
-    
-    local version = Instance.new("TextLabel")
-    version.Name = "Version"
-    version.Size = UDim2.new(1, 0, 0, 15)
-    version.Position = UDim2.new(0, 0, 1, -20)
-    version.BackgroundTransparency = 1
-    version.Text = "v3.0"
-    version.TextColor3 = Color3.fromRGB(80, 100, 220)
-    version.Font = Enum.Font.Gotham
-    version.TextSize = 10
-    version.Parent = loadFrame
-    
-    local steps = {"Initializing...", "Loading UI...", "Creating elements...", "Almost ready...", "Done!"}
-    local step = 0
-    
-    for i = 1, 30 do
-        step = math.floor(i / 6) + 1
-        if step > 5 then step = 5 end
-        status.Text = steps[step]
-        progressFill.Size = UDim2.new(i / 30, 0, 1, 0)
-        wait(0.01)
-    end
-    
-    wait(0.2)
-    
-    if callback then
-        callback()
-    end
-    
-    local tweenOut = TweenService:Create(loadFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Position = UDim2.new(0.5, -150, 1.5, 0)
+    local tweenOut = TweenService:Create(msgFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Position = UDim2.new(0.5, -100, 1.5, 0)
     })
     tweenOut:Play()
-    
     tweenOut.Completed:Connect(function()
-        loadGui:Destroy()
-        loadComplete = true
-        isLoading = false
-        for _, window in ipairs(windows) do
-            if window and window.MainFrame then
-                window.MainFrame.Visible = true
-            end
-        end
+        msgGui:Destroy()
     end)
 end
+
+spawn(showLoadMessage)
 
 local function createShadow(parent)
     local shadow = Instance.new("ImageLabel")
@@ -284,7 +215,6 @@ function YUUGTRL:CreateWindow(title, size)
     mainFrame.Position = UDim2.new(0.5, -size.X.Offset/2, 0.5, -size.Y.Offset/2)
     mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
     mainFrame.BorderSizePixel = 0
-    mainFrame.Visible = false
     mainFrame.Parent = screenGui
     
     table.insert(windows, mainFrame)
@@ -433,7 +363,6 @@ function YUUGTRL:CreateWindow(title, size)
         
         local isPressed = false
         local isToggled = false
-        local originalColor = color
         
         createCorner(button, 10)
         createButtonGradient(button, color, false)
@@ -1097,7 +1026,6 @@ function YUUGTRL:CreateWindow(title, size)
             
             local isPressed = false
             local isToggled = false
-            local originalColor = color
             
             createCorner(button, 10)
             createButtonGradient(button, color, false)
@@ -1308,10 +1236,6 @@ end
 
 function YUUGTRL:IsMobile()
     return isMobile
-end
-
-function YUUGTRL:Start(scriptFunction)
-    showLoadMessage(scriptFunction)
 end
 
 return YUUGTRL
