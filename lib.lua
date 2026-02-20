@@ -78,15 +78,19 @@ function YUUGTRL:GetText(key)
 end
 
 function YUUGTRL:RegisterTranslatable(element, key)
-    table.insert(translatableElements, {element = element, key = key})
+    if element and key then
+        table.insert(translatableElements, {element = element, key = key})
+    end
 end
 
 function YUUGTRL:UpdateAllTexts()
     for _, item in pairs(translatableElements) do
         if item.element and item.element.Parent then
             local newText = self:GetText(item.key)
-            if item.element:IsA("TextLabel") or item.element:IsA("TextButton") then
-                item.element.Text = newText
+            if newText then
+                if item.element:IsA("TextLabel") or item.element:IsA("TextButton") then
+                    item.element.Text = newText
+                end
             end
         end
     end
@@ -304,7 +308,9 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     local Title = self:CreateLabel(Header, title, UDim2.new(0, 15, 0, 0), UDim2.new(1, -100, 1, 0), options.TextColor or Color3.fromRGB(255, 255, 255))
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.TextSize = 18
-    self:RegisterTranslatable(Title, "title")
+    if options.titleKey then
+        self:RegisterTranslatable(Title, options.titleKey)
+    end
     
     local SettingsBtn
     local CloseBtn
@@ -356,7 +362,8 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         Header = Header,
         Title = Title,
         SettingsBtn = SettingsBtn,
-        CloseBtn = CloseBtn
+        CloseBtn = CloseBtn,
+        elements = {}
     }
     
     function window:CreateFrame(size, position, color, radius)
@@ -371,6 +378,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         local label = YUUGTRL:CreateLabel(self.Main, text, position, size, color)
         if translationKey then
             YUUGTRL:RegisterTranslatable(label, translationKey)
+            table.insert(self.elements, {type = "label", obj = label, key = translationKey})
         end
         return label
     end
@@ -379,19 +387,39 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         local btn = YUUGTRL:CreateButton(self.Main, text, callback, color, position, size, style)
         if translationKey then
             YUUGTRL:RegisterTranslatable(btn, translationKey)
+            table.insert(self.elements, {type = "button", obj = btn, key = translationKey})
         end
         return btn
     end
     
     function window:CreateToggle(text, default, callback, color, position, size, translationKey)
-        local toggle = YUUGTRL:CreateToggle(self.Main, text, default, callback, color, position, size)
+        local frame = YUUGTRL:CreateFrame(self.Main, size or UDim2.new(0, 200, 0, 35), position, Color3.fromRGB(45, 45, 55), 8)
+        
+        local label = YUUGTRL:CreateLabel(frame, text, UDim2.new(0, 10, 0, 0), UDim2.new(1, -50, 1, 0))
         if translationKey then
-            local label = toggle.Parent:FindFirstChildOfClass("TextLabel")
-            if label then
-                YUUGTRL:RegisterTranslatable(label, translationKey)
-            end
+            YUUGTRL:RegisterTranslatable(label, translationKey)
+            table.insert(self.elements, {type = "label", obj = label, key = translationKey})
         end
-        return toggle
+        
+        local toggleColor = default and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
+        local toggleBtn = YUUGTRL:CreateButton(frame, "", nil, toggleColor, UDim2.new(1, -40, 0, 2.5), UDim2.new(0, 30, 0, 30), "toggle")
+        Create({type = "UICorner",CornerRadius = UDim.new(0, 15),Parent = toggleBtn})
+        
+        local toggled = default or false
+        
+        toggleBtn.MouseButton1Click:Connect(function()
+            toggled = not toggled
+            local newColor = toggled and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
+            SmoothTween(toggleBtn, {BackgroundColor3 = newColor}, 0.2, Enum.EasingStyle.Bounce)
+            YUUGTRL:ApplyButtonStyle(toggleBtn, newColor)
+            if callback then callback(toggled) end
+        end)
+        
+        return toggleBtn
+    end
+    
+    function window:CreateSlider(text, min, max, default, callback, position, size)
+        return YUUGTRL:CreateSlider(self.Main, text, min, max, default, callback, position, size)
     end
     
     function window:SetSettingsCallback(callback)
@@ -422,6 +450,10 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     
     function window:SlideIn(fromPos, toPos, duration)
         YUUGTRL:SlideIn(Main, fromPos, toPos, duration)
+    end
+    
+    function window:UpdateLanguage()
+        YUUGTRL:UpdateAllTexts()
     end
     
     return window
@@ -496,10 +528,7 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size, sty
     self:MakeButton(btn, color, style)
     
     if callback then
-        btn.MouseButton1Click:Connect(function()
-            local success, err = pcall(callback)
-            if not success then warn(err) end
-        end)
+        btn.MouseButton1Click:Connect(callback)
     end
     
     return btn
