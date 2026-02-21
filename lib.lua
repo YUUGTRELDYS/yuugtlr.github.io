@@ -22,7 +22,7 @@ local splashWidth = 200 * scale
 local splashHeight = 50 * scale
 local splashFrame = Instance.new("Frame")
 splashFrame.Size = UDim2.new(0, splashWidth, 0, splashHeight)
-splashFrame.Position = UDim2.new(1, -splashWidth - 15, 0, 15)
+splashFrame.Position = UDim2.new(1, -splashWidth - 15, 1, splashHeight + 15)
 splashFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 splashFrame.BackgroundTransparency = 0.2
 splashFrame.BorderSizePixel = 0
@@ -49,6 +49,7 @@ logo.TextColor3 = Color3.fromRGB(255, 255, 255)
 logo.Font = Enum.Font.GothamBold
 logo.TextSize = 22 * scale
 logo.TextXAlignment = Enum.TextXAlignment.Left
+logo.TextTransparency = 1
 logo.Parent = splashFrame
 
 local loaded = Instance.new("TextLabel")
@@ -60,16 +61,25 @@ loaded.TextColor3 = Color3.fromRGB(255, 255, 255)
 loaded.Font = Enum.Font.Gotham
 loaded.TextSize = 14 * scale
 loaded.TextXAlignment = Enum.TextXAlignment.Left
+loaded.TextTransparency = 1
 loaded.Parent = splashFrame
 
-splashFrame:TweenPosition(UDim2.new(1, -splashWidth - 15, 0, 15), "Out", "Quad", 0.3, true)
+local appearTween = TweenService:Create(splashFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
+    Position = UDim2.new(1, -splashWidth - 15, 0, 15)
+})
+appearTween:Play()
+
+task.wait(0.1)
+
+TweenService:Create(logo, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
+TweenService:Create(loaded, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {TextTransparency = 0}):Play()
 
 task.wait(0.2)
 
-local textColorTween = TweenService:Create(logo, TweenInfo.new(0.8, Enum.EasingStyle.Quad), {TextColor3 = Color3.fromRGB(170, 85, 255)})
+local textColorTween = TweenService:Create(logo, TweenInfo.new(1.0, Enum.EasingStyle.Quad), {TextColor3 = Color3.fromRGB(170, 85, 255)})
 textColorTween:Play()
 
-task.wait(1.2)
+task.wait(1.5)
 
 local fadeTween = TweenService:Create(splashFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
     Position = UDim2.new(1, -splashWidth - 15, 1, splashHeight + 15),
@@ -128,12 +138,10 @@ local themes = {
     }
 }
 local currentTheme = themes.dark
-local themeOverrides = {}
 
 function YUUGTRL:SetTheme(themeName)
     if themes[themeName] then
         currentTheme = themes[themeName]
-        self:UpdateAllThemes()
         return true
     end
     return false
@@ -145,64 +153,6 @@ end
 
 function YUUGTRL:AddTheme(name, themeTable)
     themes[name] = themeTable
-end
-
-function YUUGTRL:OverrideThemeForObject(object, overrideTheme)
-    if object and overrideTheme then
-        themeOverrides[object] = overrideTheme
-        self:ApplyThemeToObject(object, overrideTheme)
-    end
-end
-
-function YUUGTRL:RemoveThemeOverride(object)
-    if object and themeOverrides[object] then
-        themeOverrides[object] = nil
-        self:ApplyThemeToObject(object, currentTheme)
-    end
-end
-
-function YUUGTRL:ApplyThemeToObject(object, theme)
-    if not object then return end
-    
-    if object:IsA("Frame") or object:IsA("ScrollingFrame") then
-        object.BackgroundColor3 = theme.FrameColor or theme.MainColor
-    elseif object:IsA("TextButton") then
-        object.BackgroundColor3 = theme.ButtonColor
-        local brighter = Color3.fromRGB(
-            math.min(theme.ButtonColor.R * 255 + 200, 255),
-            math.min(theme.ButtonColor.G * 255 + 200, 255),
-            math.min(theme.ButtonColor.B * 255 + 200, 255)
-        )
-        object.TextColor3 = brighter
-        
-        local gradient = object:FindFirstChildOfClass("UIGradient")
-        if gradient then
-            local darker = Color3.fromRGB(
-                math.max(theme.ButtonColor.R * 255 - 50, 0),
-                math.max(theme.ButtonColor.G * 255 - 50, 0),
-                math.max(theme.ButtonColor.B * 255 - 50, 0)
-            )
-            gradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, theme.ButtonColor),
-                ColorSequenceKeypoint.new(1, darker)
-            })
-        end
-    elseif object:IsA("TextLabel") then
-        object.TextColor3 = theme.TextColor
-    elseif object:IsA("TextBox") then
-        object.TextColor3 = theme.TextColor
-        object.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-    end
-end
-
-function YUUGTRL:UpdateAllThemes()
-    for object, overrideTheme in pairs(themeOverrides) do
-        if object and object.Parent then
-            self:ApplyThemeToObject(object, overrideTheme)
-        else
-            themeOverrides[object] = nil
-        end
-    end
 end
 
 function YUUGTRL:AddLanguage(name, translations)
@@ -394,13 +344,10 @@ function YUUGTRL:ShowNotification(title, message, duration, notifType)
     end)
 end
 
-function YUUGTRL:CreateButton(parent, text, callback, color, position, size, ignoreTheme)
+function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
     if not parent then return end
     
-    local btnColor = color or (ignoreTheme and color or currentTheme.ButtonColor)
-    if not color and not ignoreTheme then
-        btnColor = currentTheme.ButtonColor
-    end
+    local btnColor = color or currentTheme.ButtonColor
     
     local btn = Create({
         type = "TextButton",
@@ -469,10 +416,6 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size, ign
         btn.MouseButton1Click:Connect(callback)
     end
     
-    if ignoreTheme then
-        self:OverrideThemeForObject(btn, themes[ignoreTheme] or currentTheme)
-    end
-    
     return btn
 end
 
@@ -515,12 +458,12 @@ function YUUGTRL:RestoreButtonStyle(button, color)
     end
 end
 
-function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, size, colors, ignoreTheme)
+function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, size, colors)
     if not parent then return end
     colors = colors or {}
     
     local isOn = default or false
-    local buttonColor = colors.off or (ignoreTheme and colors.off or currentTheme.ButtonColor)
+    local buttonColor = colors.off or currentTheme.ButtonColor
     if colors.on then
         buttonColor = colors.on
     end
@@ -609,10 +552,6 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
         end
     end)
     
-    if ignoreTheme then
-        self:OverrideThemeForObject(button, themes[ignoreTheme] or currentTheme)
-    end
-    
     local toggleObject = {}
     
     function toggleObject:SetState(state)
@@ -650,15 +589,12 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     return toggleObject
 end
 
-function YUUGTRL:CreateTextBox(parent, placeholder, text, callback, position, size, color, ignoreTheme)
+function YUUGTRL:CreateTextBox(parent, placeholder, text, callback, position, size, color)
     if not parent then return end
     
-    local frameColor = color or (ignoreTheme and color or currentTheme.InputColor)
-    if not color and not ignoreTheme then
-        frameColor = currentTheme.InputColor
-    end
+    local frameColor = color or currentTheme.InputColor
     
-    local textColor = ignoreTheme and Color3.fromRGB(255, 255, 255) or currentTheme.TextColor
+    local textColor = currentTheme.TextColor
     
     local frame = self:CreateFrame(parent, size or UDim2.new(0, 200, 0, 35), position, frameColor, 8)
     
@@ -679,11 +615,6 @@ function YUUGTRL:CreateTextBox(parent, placeholder, text, callback, position, si
         textBox.FocusLost:Connect(function(enterPressed)
             pcall(callback, textBox.Text, enterPressed)
         end)
-    end
-    
-    if ignoreTheme then
-        self:OverrideThemeForObject(frame, themes[ignoreTheme] or currentTheme)
-        self:OverrideThemeForObject(textBox, themes[ignoreTheme] or currentTheme)
     end
     
     local textBoxObject = {}
@@ -710,13 +641,13 @@ function YUUGTRL:CreateTextBox(parent, placeholder, text, callback, position, si
     return textBoxObject
 end
 
-function YUUGTRL:CreateDropdown(parent, text, options, default, callback, position, size, colors, ignoreTheme)
+function YUUGTRL:CreateDropdown(parent, text, options, default, callback, position, size, colors)
     if not parent then return end
     
     colors = colors or {}
-    local frameColor = colors.frame or (ignoreTheme and colors.frame or currentTheme.InputColor)
-    local buttonColor = colors.button or (ignoreTheme and colors.button or currentTheme.ButtonColor)
-    local textColor = ignoreTheme and Color3.fromRGB(255, 255, 255) or currentTheme.TextColor
+    local frameColor = colors.frame or currentTheme.InputColor
+    local buttonColor = colors.button or currentTheme.ButtonColor
+    local textColor = currentTheme.TextColor
     
     local frame = self:CreateFrame(parent, size or UDim2.new(0, 200, 0, 35), position, frameColor, 8)
     
@@ -778,7 +709,7 @@ function YUUGTRL:CreateDropdown(parent, text, options, default, callback, positi
                         end
                     end, buttonColor, 
                     UDim2.new(0, 0, 0, (i-1)*30), 
-                    UDim2.new(1, 0, 0, 30), ignoreTheme)
+                    UDim2.new(1, 0, 0, 30))
                     optionButton.TextXAlignment = Enum.TextXAlignment.Left
                 end
                 
@@ -786,12 +717,6 @@ function YUUGTRL:CreateDropdown(parent, text, options, default, callback, positi
             end
         end
     end)
-    
-    if ignoreTheme then
-        self:OverrideThemeForObject(frame, themes[ignoreTheme] or currentTheme)
-        self:OverrideThemeForObject(selectedText, themes[ignoreTheme] or currentTheme)
-        self:OverrideThemeForObject(arrow, themes[ignoreTheme] or currentTheme)
-    end
     
     local dropdownObject = {}
     
@@ -823,14 +748,14 @@ function YUUGTRL:CreateDropdown(parent, text, options, default, callback, positi
     return dropdownObject
 end
 
-function YUUGTRL:CreateCheckbox(parent, text, default, callback, position, size, colors, ignoreTheme)
+function YUUGTRL:CreateCheckbox(parent, text, default, callback, position, size, colors)
     if not parent then return end
     
     colors = colors or {}
     local isChecked = default or false
-    local frameColor = colors.frame or (ignoreTheme and colors.frame or currentTheme.FrameColor)
-    local checkColor = colors.check or (ignoreTheme and colors.check or currentTheme.AccentColor)
-    local textColor = ignoreTheme and Color3.fromRGB(255, 255, 255) or currentTheme.TextColor
+    local frameColor = colors.frame or currentTheme.FrameColor
+    local checkColor = colors.check or currentTheme.AccentColor
+    local textColor = currentTheme.TextColor
     
     local frame = self:CreateFrame(parent, size or UDim2.new(0, 200, 0, 30), position, Color3.fromRGB(0, 0, 0, 0), 0)
     
@@ -866,11 +791,6 @@ function YUUGTRL:CreateCheckbox(parent, text, default, callback, position, size,
             end
         end
     end)
-    
-    if ignoreTheme then
-        self:OverrideThemeForObject(checkbox, themes[ignoreTheme] or currentTheme)
-        self:OverrideThemeForObject(label, themes[ignoreTheme] or currentTheme)
-    end
     
     local checkboxObject = {}
     
@@ -1268,10 +1188,10 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return label
     end
     
-    function window:CreateButton(text, callback, color, position, size, translationKey, ignoreTheme)
+    function window:CreateButton(text, callback, color, position, size, translationKey)
         local btnPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local btnSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        local btn = YUUGTRL:CreateButton(self.Main, text, callback, color, btnPos, btnSize, ignoreTheme)
+        local btn = YUUGTRL:CreateButton(self.Main, text, callback, color, btnPos, btnSize)
         btn.TextSize = btn.TextSize * self.scale
         if translationKey then
             YUUGTRL:RegisterTranslatable(btn, translationKey)
@@ -1306,7 +1226,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         YUUGTRL:UpdateAllTexts()
     end
     
-    function window:CreateButtonToggle(text, default, callback, position, size, colors, translationKey, ignoreTheme)
+    function window:CreateButtonToggle(text, default, callback, position, size, colors, translationKey)
         local btnPos = position
         if btnPos then
             btnPos = UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale)
@@ -1317,7 +1237,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
             btnSize = UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale)
         end
         
-        local toggle = YUUGTRL:CreateButtonToggle(self.Main, text, default, callback, btnPos, btnSize, colors, ignoreTheme)
+        local toggle = YUUGTRL:CreateButtonToggle(self.Main, text, default, callback, btnPos, btnSize, colors)
         
         if translationKey and toggle and toggle.button then
             YUUGTRL:RegisterTranslatable(toggle.button, translationKey)
@@ -1330,26 +1250,26 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return toggle
     end
     
-    function window:CreateTextBox(placeholder, text, callback, position, size, color, translationKey, ignoreTheme)
+    function window:CreateTextBox(placeholder, text, callback, position, size, color, translationKey)
         local boxPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local boxSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        local textBox = YUUGTRL:CreateTextBox(self.Main, placeholder, text, callback, boxPos, boxSize, color, ignoreTheme)
+        local textBox = YUUGTRL:CreateTextBox(self.Main, placeholder, text, callback, boxPos, boxSize, color)
         if translationKey and textBox and textBox.textBox then
             YUUGTRL:RegisterTranslatable(textBox.textBox, translationKey)
         end
         return textBox
     end
     
-    function window:CreateDropdown(text, options, default, callback, position, size, colors, translationKey, ignoreTheme)
+    function window:CreateDropdown(text, options, default, callback, position, size, colors, translationKey)
         local dropPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local dropSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        return YUUGTRL:CreateDropdown(self.Main, text, options, default, callback, dropPos, dropSize, colors, ignoreTheme)
+        return YUUGTRL:CreateDropdown(self.Main, text, options, default, callback, dropPos, dropSize, colors)
     end
     
-    function window:CreateCheckbox(text, default, callback, position, size, colors, translationKey, ignoreTheme)
+    function window:CreateCheckbox(text, default, callback, position, size, colors, translationKey)
         local checkPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local checkSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        return YUUGTRL:CreateCheckbox(self.Main, text, default, callback, checkPos, checkSize, colors, ignoreTheme)
+        return YUUGTRL:CreateCheckbox(self.Main, text, default, callback, checkPos, checkSize, colors)
     end
     
     function window:CreateProgressBar(initial, max, position, size, color)
