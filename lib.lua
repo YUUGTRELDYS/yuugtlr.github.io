@@ -271,9 +271,14 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     
     local SettingsBtn
     local CloseBtn
+    local ResizeBtn
     
     if options.ShowSettings ~= false then
-        SettingsBtn = self:CreateButton(Header, "⚙", nil, options.AccentColor or Color3.fromRGB(80, 100, 220), UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30), "darken")
+        SettingsBtn = self:CreateButton(Header, "⚙", nil, options.AccentColor or Color3.fromRGB(80, 100, 220), UDim2.new(1, -105, 0, 5), UDim2.new(0, 30, 0, 30), "darken")
+    end
+    
+    if options.ShowResize ~= false then
+        ResizeBtn = self:CreateButton(Header, "◢", nil, options.AccentColor or Color3.fromRGB(80, 100, 220), UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30), "hover")
     end
     
     if options.ShowClose ~= false then
@@ -284,6 +289,9 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     end
     
     local dragging, dragInput, dragStart, startPos
+    local resizing = false
+    var resizeStart = nil
+    var resizeStartSize = nil
     
     Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -304,10 +312,33 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         end
     end)
     
+    if ResizeBtn then
+        ResizeBtn.MouseButton1Down:Connect(function(input)
+            resizing = true
+            resizeStart = input.Position
+            resizeStartSize = Main.Size
+        end)
+        
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                resizing = false
+                resizeStart = nil
+                resizeStartSize = nil
+            end
+        end)
+    end
+    
     UserInputService.InputChanged:Connect(function(input)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
             Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+        
+        if resizing and resizeStart and resizeStartSize and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - resizeStart
+            local newWidth = math.max(200, resizeStartSize.X.Offset + delta.X)
+            local newHeight = math.max(150, resizeStartSize.Y.Offset + delta.Y)
+            Main.Size = UDim2.new(0, newWidth, 0, newHeight)
         end
     end)
     
@@ -318,6 +349,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         Title = Title,
         SettingsBtn = SettingsBtn,
         CloseBtn = CloseBtn,
+        ResizeBtn = ResizeBtn,
         elements = {}
     }
     
@@ -383,6 +415,12 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     function window:SetCloseCallback(callback)
         if CloseBtn then
             CloseBtn.MouseButton1Click:Connect(callback)
+        end
+    end
+    
+    function window:SetResizeEnabled(enabled)
+        if ResizeBtn then
+            ResizeBtn.Visible = enabled
         end
     end
     
