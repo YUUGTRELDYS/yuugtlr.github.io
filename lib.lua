@@ -171,62 +171,6 @@ local function ApplyGradientToText(label, topColor, bottomColor)
     gradient.Parent = label
 end
 
-local function CreateMultiColorText(parent, text, parts, position, size)
-    local frame = Instance.new("Frame")
-    frame.Size = size or UDim2.new(0, 200, 0, 30)
-    frame.Position = position or UDim2.new(0, 0, 0, 0)
-    frame.BackgroundTransparency = 1
-    frame.Parent = parent
-    
-    local totalLength = 0
-    for _, part in ipairs(parts) do
-        totalLength = totalLength + #part.text
-    end
-    
-    local currentX = 0
-    local labels = {}
-    
-    for i, part in ipairs(parts) do
-        local width = (#part.text / totalLength) * frame.AbsoluteSize.X
-        local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(0, width, 1, 0)
-        label.Position = UDim2.new(0, currentX, 0, 0)
-        label.BackgroundTransparency = 1
-        label.Text = part.text
-        label.TextColor3 = part.color or Color3.fromRGB(255, 255, 255)
-        label.Font = part.font or Enum.Font.GothamBold
-        label.TextSize = part.textSize or 14
-        label.Parent = frame
-        
-        if part.effect == "rainbow" then
-            spawn(function()
-                local hue = 0
-                while label and label.Parent do
-                    hue = (hue + 0.02) % 1
-                    label.TextColor3 = Color3.fromHSV(hue, 1, 1)
-                    task.wait(0.03)
-                end
-            end)
-        elseif part.effect == "pulse" then
-            spawn(function()
-                local toggle = false
-                while label and label.Parent do
-                    toggle = not toggle
-                    label.TextColor3 = toggle and part.color or (part.pulseColor or Color3.fromRGB(255, 255, 255))
-                    task.wait(part.pulseSpeed or 0.3)
-                end
-            end)
-        elseif part.effect == "gradient" then
-            ApplyGradientToText(label, part.topColor or part.color, part.bottomColor or Color3.fromRGB(0, 0, 0))
-        end
-        
-        currentX = currentX + width
-        table.insert(labels, label)
-    end
-    
-    return frame, labels
-end
-
 local function Create(props)
     local obj = Instance.new(props.type)
     for i, v in pairs(props) do
@@ -346,12 +290,12 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     if size then
         windowSize = UDim2.new(size.X.Scale, size.X.Offset * scale, size.Y.Scale, size.Y.Offset * scale)
     else
-        windowSize = UDim2.new(0, 320 * scale, 0, 400 * scale)
+        windowSize = UDim2.new(0, 350 * scale, 0, 450 * scale)
     end
     
     local windowPos = position
     if not windowPos then
-        windowPos = UDim2.new(0.5, -(160 * scale), 0.5, -(200 * scale))
+        windowPos = UDim2.new(0.5, -(175 * scale), 0.5, -(225 * scale))
     elseif position then
         windowPos = UDim2.new(position.X.Scale, position.X.Offset * scale, position.Y.Scale, position.Y.Offset * scale)
     end
@@ -374,21 +318,21 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         Parent = ScreenGui
     })
     
-    Create({type = "UICorner",CornerRadius = UDim.new(0, 10 * scale),Parent = Main})
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 12 * scale),Parent = Main})
     
     local Header = Create({
         type = "Frame",
-        Size = UDim2.new(1, 0, 0, 35 * scale),
+        Size = UDim2.new(1, 0, 0, 40 * scale),
         BackgroundColor3 = options.HeaderColor or Color3.fromRGB(40, 40, 50),
         BorderSizePixel = 0,
         Parent = Main
     })
     
-    Create({type = "UICorner",CornerRadius = UDim.new(0, 10 * scale),Parent = Header})
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 12 * scale),Parent = Header})
     
-    local Title = self:CreateLabel(Header, title, UDim2.new(0, 12 * scale, 0, 0), UDim2.new(1, -90 * scale, 1, 0), options.TextColor or Color3.fromRGB(255, 255, 255))
+    local Title = self:CreateLabel(Header, title, UDim2.new(0, 15 * scale, 0, 0), UDim2.new(1, -100 * scale, 1, 0), options.TextColor or Color3.fromRGB(255, 255, 255))
     Title.TextXAlignment = Enum.TextXAlignment.Left
-    Title.TextSize = 16 * scale
+    Title.TextSize = 18 * scale
     if options.titleKey then
         self:RegisterTranslatable(Title, options.titleKey)
     end
@@ -397,11 +341,11 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     local CloseBtn
     
     if options.ShowSettings ~= false then
-        SettingsBtn = self:CreateButton(Header, "⚙", nil, options.AccentColor or Color3.fromRGB(80, 100, 220), UDim2.new(1, -65 * scale, 0, 5 * scale), UDim2.new(0, 25 * scale, 0, 25 * scale), "darken")
+        SettingsBtn = self:CreateButton(Header, "⚙", nil, options.AccentColor or Color3.fromRGB(80, 100, 220), UDim2.new(1, -70 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale), "darken")
     end
     
     if options.ShowClose ~= false then
-        CloseBtn = self:CreateButton(Header, "X", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -30 * scale, 0, 5 * scale), UDim2.new(0, 25 * scale, 0, 25 * scale), "darken")
+        CloseBtn = self:CreateButton(Header, "X", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -35 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale), "darken")
         CloseBtn.MouseButton1Click:Connect(function() 
             ScreenGui:Destroy() 
         end)
@@ -532,10 +476,6 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return label
     end
     
-    function window:CreateMultiColorText(text, parts, position, size)
-        return CreateMultiColorText(self.Main, text, parts, position, size)
-    end
-    
     function window:CreateButton(text, callback, color, position, size, style, translationKey)
         local btnPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local btnSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
@@ -602,7 +542,7 @@ function YUUGTRL:CreateFrame(parent, size, position, color, radius)
         Parent = parent
     })
     
-    Create({type = "UICorner",CornerRadius = UDim.new(0, radius or 10),Parent = frame})
+    Create({type = "UICorner",CornerRadius = UDim.new(0, radius or 12),Parent = frame})
     
     return frame
 end
