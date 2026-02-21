@@ -474,16 +474,26 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     end
     
     function window:CreateButtonToggle(text, default, callback, position, size, colors, translationKey)
-        local btnPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
-        local btnSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
+        local btnPos = position
+        if btnPos then
+            btnPos = UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale)
+        end
+        
+        local btnSize = size
+        if btnSize then
+            btnSize = UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale)
+        end
         
         local toggle = YUUGTRL:CreateButtonToggle(self.Main, text, default, callback, btnPos, btnSize, colors)
         
-        if translationKey then
+        if translationKey and toggle and toggle.button then
             YUUGTRL:RegisterTranslatable(toggle.button, translationKey)
         end
         
-        table.insert(self.elements, {type = "button-toggle", obj = toggle})
+        if toggle and toggle.button then
+            table.insert(self.elements, {type = "button-toggle", obj = toggle})
+        end
+        
         return toggle
     end
     
@@ -587,19 +597,23 @@ function YUUGTRL:CreateSlider(parent, text, min, max, default, callback, positio
     return slider
 end
 
+-- ИСПРАВЛЕННАЯ ФУНКЦИЯ CreateButtonToggle - теперь просто меняет яркость без смены цвета
 function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, size, colors)
     if not parent then return end
     
     colors = colors or {}
     local isOn = default or false
     
-    local colorOn = colors.on or Color3.fromRGB(80, 200, 120)
-    local colorOff = colors.off or Color3.fromRGB(60, 100, 200)
+    -- Используем один цвет для обоих состояний (цвет кнопки)
+    local buttonColor = colors.off or Color3.fromRGB(60, 100, 200)
+    if colors.on then
+        buttonColor = colors.on  -- если указан on, используем его как основной цвет
+    end
     
     local button = Instance.new("TextButton")
     button.Size = size or UDim2.new(0, 120, 0, 35)
     button.Position = position or UDim2.new(0, 0, 0, 0)
-    button.BackgroundColor3 = isOn and colorOn or colorOff
+    button.BackgroundColor3 = buttonColor
     button.Text = text or "Button"
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Font = Enum.Font.GothamBold
@@ -610,38 +624,63 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = button
     
+    local darker = Color3.fromRGB(
+        math.max(buttonColor.R * 255 - 50, 0),
+        math.max(buttonColor.G * 255 - 50, 0),
+        math.max(buttonColor.B * 255 - 50, 0)
+    )
+    
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, buttonColor),
+        ColorSequenceKeypoint.new(1, darker)
+    })
+    gradient.Rotation = 90
+    gradient.Parent = button
+    
+    local brighter = Color3.fromRGB(
+        math.min(buttonColor.R * 255 + 120, 255),
+        math.min(buttonColor.G * 255 + 120, 255),
+        math.min(buttonColor.B * 255 + 120, 255)
+    )
+    button.TextColor3 = brighter
+    
     local function updateGradient()
-        local currentColor = isOn and colorOn or colorOff
-        local darker = Color3.fromRGB(
-            math.max(currentColor.R * 255 - 50, 0),
-            math.max(currentColor.G * 255 - 50, 0),
-            math.max(currentColor.B * 255 - 50, 0)
+        -- В зависимости от состояния делаем кнопку темнее или светлее
+        local currentColor = buttonColor
+        local darker2 = Color3.fromRGB(
+            math.max(currentColor.R * 255 - (isOn and 70 or 50), 0),
+            math.max(currentColor.G * 255 - (isOn and 70 or 50), 0),
+            math.max(currentColor.B * 255 - (isOn and 70 or 50), 0)
         )
         
         if button:FindFirstChild("UIGradient") then
             button:FindFirstChild("UIGradient"):Destroy()
         end
         
-        local gradient = Instance.new("UIGradient")
-        gradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, currentColor),
-            ColorSequenceKeypoint.new(1, darker)
+        local gradient2 = Instance.new("UIGradient")
+        gradient2.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, isOn and darker2 or currentColor),
+            ColorSequenceKeypoint.new(1, darker2)
         })
-        gradient.Rotation = 90
-        gradient.Parent = button
+        gradient2.Rotation = 90
+        gradient2.Parent = button
         
-        local brighter = Color3.fromRGB(
-            math.min(currentColor.R * 255 + 120, 255),
-            math.min(currentColor.G * 255 + 120, 255),
-            math.min(currentColor.B * 255 + 120, 255)
-        )
-        button.TextColor3 = brighter
+        if isOn then
+            button.TextColor3 = Color3.fromRGB(
+                math.min(currentColor.R * 255 + 80, 255),
+                math.min(currentColor.G * 255 + 80, 255),
+                math.min(currentColor.B * 255 + 80, 255)
+            )
+        else
+            button.TextColor3 = brighter
+        end
     end
     
     updateGradient()
     
     button.MouseEnter:Connect(function()
-        local currentColor = isOn and colorOn or colorOff
+        local currentColor = buttonColor
         local hoverColor = Color3.fromRGB(
             math.min(currentColor.R * 255 + 30, 255),
             math.min(currentColor.G * 255 + 30, 255),
@@ -657,13 +696,13 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
             button:FindFirstChild("UIGradient"):Destroy()
         end
         
-        local gradient = Instance.new("UIGradient")
-        gradient.Color = ColorSequence.new({
+        local gradient2 = Instance.new("UIGradient")
+        gradient2.Color = ColorSequence.new({
             ColorSequenceKeypoint.new(0, hoverColor),
             ColorSequenceKeypoint.new(1, hoverDarker)
         })
-        gradient.Rotation = 90
-        gradient.Parent = button
+        gradient2.Rotation = 90
+        gradient2.Parent = button
     end)
     
     button.MouseLeave:Connect(function()
@@ -672,21 +711,6 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     
     button.MouseButton1Click:Connect(function()
         isOn = not isOn
-        updateGradient()
-        local currentColor = isOn and colorOn or colorOff
-        local darker = Color3.fromRGB(
-            math.max(currentColor.R * 255 - 70, 0),
-            math.max(currentColor.G * 255 - 70, 0),
-            math.max(currentColor.B * 255 - 70, 0)
-        )
-        local gradient = button:FindFirstChild("UIGradient")
-        if gradient then
-            gradient.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, darker),
-                ColorSequenceKeypoint.new(1, darker)
-            })
-        end
-        task.wait(0.1)
         updateGradient()
         if callback then
             pcall(callback, isOn)
@@ -716,8 +740,8 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     end
     
     function toggleObject:SetColors(newColors)
-        if newColors.on then colorOn = newColors.on end
-        if newColors.off then colorOff = newColors.off end
+        if newColors.on then buttonColor = newColors.on end
+        if newColors.off then buttonColor = newColors.off end
         updateGradient()
     end
     
