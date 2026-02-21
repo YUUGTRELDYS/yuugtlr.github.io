@@ -75,7 +75,6 @@ end)
 local languages = {}
 local currentLanguage = "English"
 local translatableElements = {}
-local valueElements = {} 
 
 function YUUGTRL:AddLanguage(name, translations)
     languages[name] = translations
@@ -130,34 +129,6 @@ function YUUGTRL:UpdateAllTexts()
     end
 end
 
-function YUUGTRL:UpdateValueColor(element, value, colors)
-    if not element then return end
-    
-    colors = colors or {}
-    local falseColor = colors.falseColor or Color3.fromRGB(255, 80, 80)
-    local trueColor = colors.trueColor or Color3.fromRGB(80, 220, 100)
-    
-    local targetColor = value and trueColor or falseColor
-    
-    if element:IsA("TextLabel") or element:IsA("TextButton") then
-        SmoothTween(element, {TextColor3 = targetColor}, 0.3, Enum.EasingStyle.Quad)
-    end
-end
-
-function YUUGTRL:CreateValueLabel(parent, text, position, size, color, colors)
-    local label = self:CreateLabel(parent, text, position, size, color)
-    
-    if colors then
-        table.insert(valueElements, {
-            element = label,
-            colors = colors,
-            currentValue = text == "true" or text == "false" and text == "true" or nil
-        })
-    end
-    
-    return label
-end
-
 local function Create(props)
     local obj = Instance.new(props.type)
     for i, v in pairs(props) do
@@ -171,37 +142,6 @@ local function Create(props)
         end
     end
     return obj
-end
-
-local function SmoothTween(obj, properties, duration, easingStyle, easingDirection)
-    if not obj then return end
-    
-    local validProperties = {}
-    for prop, value in pairs(properties) do
-        if obj:IsA("UIGradient") and prop == "Color" then
-            pcall(function()
-                obj[prop] = value
-            end)
-        else
-            validProperties[prop] = value
-        end
-    end
-    
-    if next(validProperties) then
-        local success, err = pcall(function()
-            local tweenInfo = TweenInfo.new(duration or 0.3, easingStyle or Enum.EasingStyle.Quad, easingDirection or Enum.EasingDirection.Out)
-            local tween = TweenService:Create(obj, tweenInfo, validProperties)
-            tween:Play()
-            return tween
-        end)
-        if not success then
-            for prop, value in pairs(validProperties) do
-                pcall(function()
-                    obj[prop] = value
-                end)
-            end
-        end
-    end
 end
 
 function YUUGTRL:ApplyButtonStyle(button, color)
@@ -270,7 +210,6 @@ function YUUGTRL:MakeButton(button, color, style)
         button.MouseButton1Up:Connect(function() 
             self:RestoreButtonStyle(button, btnColor) 
         end)
-    elseif btnStyle == "toggle" then
     elseif btnStyle == "hover" then
         button.MouseEnter:Connect(function() 
             self:LightenButton(button) 
@@ -390,21 +329,10 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return YUUGTRL:CreateScrollingFrame(self.Main, size, position, color, radius)
     end
     
-    function window:CreateLabel(text, position, size, color, translationKey, valueColors)
+    function window:CreateLabel(text, position, size, color, translationKey)
         local label = YUUGTRL:CreateLabel(self.Main, text, position, size, color)
         if translationKey then
             YUUGTRL:RegisterTranslatable(label, translationKey)
-        end
-        if valueColors then
-            local isBool = text == "true" or text == "false"
-            table.insert(valueElements, {
-                element = label,
-                colors = valueColors,
-                currentValue = isBool and text == "true" or nil
-            })
-            if isBool then
-                YUUGTRL:UpdateValueColor(label, text == "true", valueColors)
-            end
         end
         return label
     end
@@ -426,7 +354,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         end
         
         local toggleColor = default and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
-        local toggleBtn = YUUGTRL:CreateButton(frame, "", nil, toggleColor, UDim2.new(1, -40, 0, 2.5), UDim2.new(0, 30, 0, 30), "toggle")
+        local toggleBtn = YUUGTRL:CreateButton(frame, "", nil, toggleColor, UDim2.new(1, -40, 0, 2.5), UDim2.new(0, 30, 0, 30), "darken")
         Create({type = "UICorner",CornerRadius = UDim.new(0, 15),Parent = toggleBtn})
         
         local toggled = default or false
