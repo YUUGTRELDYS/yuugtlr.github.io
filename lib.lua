@@ -5,6 +5,9 @@ local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local isMobile = UserInputService.TouchEnabled
 
+-- Масштабирование для мобильных устройств
+local mobileScale = isMobile and 0.7 or 1.0
+
 local splash = Instance.new("ScreenGui")
 splash.Name = "YUUGTRLSplash"
 splash.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -13,15 +16,15 @@ splash.ResetOnSpawn = false
 splash.Parent = player:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 60)
-frame.Position = UDim2.new(0.5, -100, 0, -70)
+frame.Size = UDim2.new(0, 200 * mobileScale, 0, 60 * mobileScale)
+frame.Position = UDim2.new(0.5, -100 * mobileScale, 0, -70 * mobileScale)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 frame.BackgroundTransparency = 0.3
 frame.BorderSizePixel = 0
 frame.Parent = splash
 
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 12)
+corner.CornerRadius = UDim.new(0, 12 * mobileScale)
 corner.Parent = frame
 
 local gradient = Instance.new("UIGradient")
@@ -33,28 +36,28 @@ gradient.Rotation = 90
 gradient.Parent = frame
 
 local text = Instance.new("TextLabel")
-text.Size = UDim2.new(0.6, -5, 1, 0)
-text.Position = UDim2.new(0, 10, 0, 0)
+text.Size = UDim2.new(0.6, -5 * mobileScale, 1, 0)
+text.Position = UDim2.new(0, 10 * mobileScale, 0, 0)
 text.BackgroundTransparency = 1
 text.Text = "YUUGTRL"
 text.TextColor3 = Color3.fromRGB(255, 255, 255)
 text.Font = Enum.Font.GothamBold
-text.TextSize = 24
+text.TextSize = 24 * mobileScale
 text.TextXAlignment = Enum.TextXAlignment.Left
 text.Parent = frame
 
 local loadedText = Instance.new("TextLabel")
-loadedText.Size = UDim2.new(0.4, -5, 1, 0)
+loadedText.Size = UDim2.new(0.4, -5 * mobileScale, 1, 0)
 loadedText.Position = UDim2.new(0.6, 0, 0, 0)
 loadedText.BackgroundTransparency = 1
 loadedText.Text = "loaded"
 loadedText.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadedText.Font = Enum.Font.Gotham
-loadedText.TextSize = 16
+loadedText.TextSize = 16 * mobileScale
 loadedText.TextXAlignment = Enum.TextXAlignment.Left
 loadedText.Parent = frame
 
-frame:TweenPosition(UDim2.new(0.5, -100, 0, 30), "Out", "Quad", 0.9, true)
+frame:TweenPosition(UDim2.new(0.5, -100 * mobileScale, 0, 30 * mobileScale), "Out", "Quad", 0.9, true)
 
 task.wait(0.4)
 
@@ -232,6 +235,12 @@ end
 function YUUGTRL:CreateWindow(title, size, position, options)
     options = options or {}
     
+    -- Применяем масштабирование для мобильных устройств
+    local windowSize = size
+    if isMobile and size then
+        windowSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+    end
+    
     local ScreenGui = Create({
         type = "ScreenGui",
         Name = "YUUGTRL_" .. (title:gsub("%s+", "") or "Window"),
@@ -243,28 +252,28 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     
     local Main = Create({
         type = "Frame",
-        Size = size or UDim2.new(0, 350, 0, 450),
-        Position = position or UDim2.new(0.5, -175, 0.5, -225),
+        Size = windowSize or (isMobile and UDim2.new(0, 280 * mobileScale, 0, 400 * mobileScale) or UDim2.new(0, 350, 0, 450)),
+        Position = position or UDim2.new(0.5, isMobile and -140 * mobileScale or -175, 0.5, isMobile and -200 * mobileScale or -225),
         BackgroundColor3 = options.MainColor or Color3.fromRGB(30, 30, 40),
         BorderSizePixel = 0,
         Parent = ScreenGui
     })
     
-    Create({type = "UICorner",CornerRadius = UDim.new(0, 12),Parent = Main})
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 12 * mobileScale),Parent = Main})
     
     local Header = Create({
         type = "Frame",
-        Size = UDim2.new(1, 0, 0, 40),
+        Size = UDim2.new(1, 0, 0, 40 * mobileScale),
         BackgroundColor3 = options.HeaderColor or Color3.fromRGB(40, 40, 50),
         BorderSizePixel = 0,
         Parent = Main
     })
     
-    Create({type = "UICorner",CornerRadius = UDim.new(0, 12),Parent = Header})
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 12 * mobileScale),Parent = Header})
     
-    local Title = self:CreateLabel(Header, title, UDim2.new(0, 15, 0, 0), UDim2.new(1, -100, 1, 0), options.TextColor or Color3.fromRGB(255, 255, 255))
+    local Title = self:CreateLabel(Header, title, UDim2.new(0, 15 * mobileScale, 0, 0), UDim2.new(1, -100 * mobileScale, 1, 0), options.TextColor or Color3.fromRGB(255, 255, 255))
     Title.TextXAlignment = Enum.TextXAlignment.Left
-    Title.TextSize = 18
+    Title.TextSize = 18 * mobileScale
     if options.titleKey then
         self:RegisterTranslatable(Title, options.titleKey)
     end
@@ -273,11 +282,11 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     local CloseBtn
     
     if options.ShowSettings ~= false then
-        SettingsBtn = self:CreateButton(Header, "⚙", nil, options.AccentColor or Color3.fromRGB(80, 100, 220), UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30), "darken")
+        SettingsBtn = self:CreateButton(Header, "⚙", nil, options.AccentColor or Color3.fromRGB(80, 100, 220), UDim2.new(1, -70 * mobileScale, 0, 5 * mobileScale), UDim2.new(0, 30 * mobileScale, 0, 30 * mobileScale), "darken")
     end
     
     if options.ShowClose ~= false then
-        CloseBtn = self:CreateButton(Header, "X", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30), "darken")
+        CloseBtn = self:CreateButton(Header, "X", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -35 * mobileScale, 0, 5 * mobileScale), UDim2.new(0, 30 * mobileScale, 0, 30 * mobileScale), "darken")
         CloseBtn.MouseButton1Click:Connect(function() 
             ScreenGui:Destroy() 
         end)
@@ -318,19 +327,47 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         Title = Title,
         SettingsBtn = SettingsBtn,
         CloseBtn = CloseBtn,
-        elements = {}
+        elements = {},
+        mobileScale = mobileScale
     }
     
     function window:CreateFrame(size, position, color, radius)
-        return YUUGTRL:CreateFrame(self.Main, size, position, color, radius)
+        local frameSize = size
+        local framePos = position
+        if isMobile and size then
+            frameSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+        end
+        if isMobile and position then
+            framePos = UDim2.new(position.X.Scale, position.X.Offset * mobileScale, position.Y.Scale, position.Y.Offset * mobileScale)
+        end
+        return YUUGTRL:CreateFrame(self.Main, frameSize, framePos, color, radius and radius * mobileScale)
     end
     
     function window:CreateScrollingFrame(size, position, color, radius)
-        return YUUGTRL:CreateScrollingFrame(self.Main, size, position, color, radius)
+        local frameSize = size
+        local framePos = position
+        if isMobile and size then
+            frameSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+        end
+        if isMobile and position then
+            framePos = UDim2.new(position.X.Scale, position.X.Offset * mobileScale, position.Y.Scale, position.Y.Offset * mobileScale)
+        end
+        return YUUGTRL:CreateScrollingFrame(self.Main, frameSize, framePos, color, radius and radius * mobileScale)
     end
     
     function window:CreateLabel(text, position, size, color, translationKey)
-        local label = YUUGTRL:CreateLabel(self.Main, text, position, size, color)
+        local labelPos = position
+        local labelSize = size
+        if isMobile and position then
+            labelPos = UDim2.new(position.X.Scale, position.X.Offset * mobileScale, position.Y.Scale, position.Y.Offset * mobileScale)
+        end
+        if isMobile and size then
+            labelSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+        end
+        local label = YUUGTRL:CreateLabel(self.Main, text, labelPos, labelSize, color)
+        if isMobile then
+            label.TextSize = label.TextSize * mobileScale
+        end
         if translationKey then
             YUUGTRL:RegisterTranslatable(label, translationKey)
         end
@@ -338,7 +375,18 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     end
     
     function window:CreateButton(text, callback, color, position, size, style, translationKey)
-        local btn = YUUGTRL:CreateButton(self.Main, text, callback, color, position, size, style)
+        local btnPos = position
+        local btnSize = size
+        if isMobile and position then
+            btnPos = UDim2.new(position.X.Scale, position.X.Offset * mobileScale, position.Y.Scale, position.Y.Offset * mobileScale)
+        end
+        if isMobile and size then
+            btnSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+        end
+        local btn = YUUGTRL:CreateButton(self.Main, text, callback, color, btnPos, btnSize, style)
+        if isMobile then
+            btn.TextSize = btn.TextSize * mobileScale
+        end
         if translationKey then
             YUUGTRL:RegisterTranslatable(btn, translationKey)
         end
@@ -346,61 +394,46 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     end
     
     function window:CreateToggle(text, default, callback, color, position, size, translationKey)
-        local frame = YUUGTRL:CreateFrame(self.Main, size or UDim2.new(0, 200, 0, 35), position, Color3.fromRGB(45, 45, 55), 8)
-        
-        local label = YUUGTRL:CreateLabel(frame, text, UDim2.new(0, 10, 0, 0), UDim2.new(1, -50, 1, 0))
-        if translationKey then
-            YUUGTRL:RegisterTranslatable(label, translationKey)
+        local togglePos = position
+        local toggleSize = size
+        if isMobile and position then
+            togglePos = UDim2.new(position.X.Scale, position.X.Offset * mobileScale, position.Y.Scale, position.Y.Offset * mobileScale)
         end
-        
-        local toggleColor = default and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
-        local toggleBtn = YUUGTRL:CreateButton(frame, "", nil, toggleColor, UDim2.new(1, -40, 0, 2.5), UDim2.new(0, 30, 0, 30), "darken")
-        Create({type = "UICorner",CornerRadius = UDim.new(0, 15),Parent = toggleBtn})
-        
-        local toggled = default or false
-        
-        toggleBtn.MouseButton1Click:Connect(function()
-            toggled = not toggled
-            local newColor = toggled and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
-            toggleBtn.BackgroundColor3 = newColor
-            YUUGTRL:ApplyButtonStyle(toggleBtn, newColor)
-            if callback then callback(toggled) end
-        end)
-        
-        return toggleBtn
+        if isMobile and size then
+            toggleSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+        end
+        local toggle = YUUGTRL:CreateToggle(self.Main, text, default, callback, color, togglePos, toggleSize)
+        if isMobile then
+            local label = toggle.Parent:FindFirstChildOfClass("TextLabel")
+            if label then
+                label.TextSize = label.TextSize * mobileScale
+            end
+        end
+        return toggle
     end
     
     function window:CreateSlider(text, min, max, default, callback, position, size)
-        return YUUGTRL:CreateSlider(self.Main, text, min, max, default, callback, position, size)
+        local sliderPos = position
+        local sliderSize = size
+        if isMobile and position then
+            sliderPos = UDim2.new(position.X.Scale, position.X.Offset * mobileScale, position.Y.Scale, position.Y.Offset * mobileScale)
+        end
+        if isMobile and size then
+            sliderSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+        end
+        return YUUGTRL:CreateSlider(self.Main, text, min, max, default, callback, sliderPos, sliderSize)
     end
     
     function window:CreateSizeControl(position, size)
-        local frame = YUUGTRL:CreateFrame(self.Main, size or UDim2.new(0, 150, 0, 35), position, Color3.fromRGB(45, 45, 55), 8)
-        
-        local label = YUUGTRL:CreateLabel(frame, "Window Size", UDim2.new(0, 10, 0, 0), UDim2.new(1, -80, 1, 0))
-        label.TextSize = 12
-        
-        local currentWidth = self.Main.Size.X.Offset
-        local currentHeight = self.Main.Size.Y.Offset
-        local sizeLabel = YUUGTRL:CreateLabel(frame, currentWidth.."x"..currentHeight, UDim2.new(0.5, -20, 0, 0), UDim2.new(0, 60, 1, 0))
-        sizeLabel.TextXAlignment = Enum.TextXAlignment.Center
-        sizeLabel.TextSize = 12
-        
-        local minusBtn = YUUGTRL:CreateButton(frame, "-", function()
-            local newWidth = math.max(200, self.Main.Size.X.Offset - 50)
-            local newHeight = math.max(150, self.Main.Size.Y.Offset - 30)
-            self.Main.Size = UDim2.new(0, newWidth, 0, newHeight)
-            sizeLabel.Text = newWidth.."x"..newHeight
-        end, Color3.fromRGB(220, 80, 80), UDim2.new(1, -70, 0, 2.5), UDim2.new(0, 30, 0, 30), "darken")
-        
-        local plusBtn = YUUGTRL:CreateButton(frame, "+", function()
-            local newWidth = self.Main.Size.X.Offset + 50
-            local newHeight = self.Main.Size.Y.Offset + 30
-            self.Main.Size = UDim2.new(0, newWidth, 0, newHeight)
-            sizeLabel.Text = newWidth.."x"..newHeight
-        end, Color3.fromRGB(80, 220, 100), UDim2.new(1, -35, 0, 2.5), UDim2.new(0, 30, 0, 30), "lighten")
-        
-        return frame
+        local controlPos = position
+        local controlSize = size
+        if isMobile and position then
+            controlPos = UDim2.new(position.X.Scale, position.X.Offset * mobileScale, position.Y.Scale, position.Y.Offset * mobileScale)
+        end
+        if isMobile and size then
+            controlSize = UDim2.new(size.X.Scale, size.X.Offset * mobileScale, size.Y.Scale, size.Y.Offset * mobileScale)
+        end
+        return YUUGTRL:CreateSizeControl(self, controlPos, controlSize)
     end
     
     function window:SetSettingsCallback(callback)
@@ -505,6 +538,29 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size, sty
     return btn
 end
 
+function YUUGTRL:CreateToggle(parent, text, default, callback, color, position, size)
+    if not parent then return end
+    local frame = self:CreateFrame(parent, size or UDim2.new(0, 200, 0, 35), position, Color3.fromRGB(45, 45, 55), 8)
+    
+    local label = self:CreateLabel(frame, text, UDim2.new(0, 10, 0, 0), UDim2.new(1, -50, 1, 0))
+    
+    local toggleColor = default and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
+    local toggleBtn = self:CreateButton(frame, "", nil, toggleColor, UDim2.new(1, -40, 0, 2.5), UDim2.new(0, 30, 0, 30), "darken")
+    Create({type = "UICorner",CornerRadius = UDim.new(0, 15),Parent = toggleBtn})
+    
+    local toggled = default or false
+    
+    toggleBtn.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        local newColor = toggled and Color3.fromRGB(80, 220, 100) or Color3.fromRGB(220, 80, 80)
+        toggleBtn.BackgroundColor3 = newColor
+        self:ApplyButtonStyle(toggleBtn, newColor)
+        if callback then callback(toggled) end
+    end)
+    
+    return toggleBtn
+end
+
 function YUUGTRL:CreateSlider(parent, text, min, max, default, callback, position, size)
     if not parent then return end
     local frame = self:CreateFrame(parent, size or UDim2.new(0, 200, 0, 50), position, Color3.fromRGB(45, 45, 55), 8)
@@ -545,6 +601,36 @@ function YUUGTRL:CreateSlider(parent, text, min, max, default, callback, positio
     end)
     
     return slider
+end
+
+function YUUGTRL:CreateSizeControl(window, position, size)
+    if not window then return end
+    local frame = self:CreateFrame(window.Main, size or UDim2.new(0, 150, 0, 35), position, Color3.fromRGB(45, 45, 55), 8)
+    
+    local label = self:CreateLabel(frame, "Window Size", UDim2.new(0, 10, 0, 0), UDim2.new(1, -80, 1, 0))
+    label.TextSize = 12 * (window.mobileScale or 1)
+    
+    local currentWidth = window.Main.Size.X.Offset
+    local currentHeight = window.Main.Size.Y.Offset
+    local sizeLabel = self:CreateLabel(frame, currentWidth.."x"..currentHeight, UDim2.new(0.5, -20, 0, 0), UDim2.new(0, 60, 1, 0))
+    sizeLabel.TextXAlignment = Enum.TextXAlignment.Center
+    sizeLabel.TextSize = 12 * (window.mobileScale or 1)
+    
+    local minusBtn = self:CreateButton(frame, "-", function()
+        local newWidth = math.max(200, window.Main.Size.X.Offset - 50 * (window.mobileScale or 1))
+        local newHeight = math.max(150, window.Main.Size.Y.Offset - 30 * (window.mobileScale or 1))
+        window.Main.Size = UDim2.new(0, newWidth, 0, newHeight)
+        sizeLabel.Text = newWidth.."x"..newHeight
+    end, Color3.fromRGB(220, 80, 80), UDim2.new(1, -70, 0, 2.5), UDim2.new(0, 30, 0, 30), "darken")
+    
+    local plusBtn = self:CreateButton(frame, "+", function()
+        local newWidth = window.Main.Size.X.Offset + 50 * (window.mobileScale or 1)
+        local newHeight = window.Main.Size.Y.Offset + 30 * (window.mobileScale or 1)
+        window.Main.Size = UDim2.new(0, newWidth, 0, newHeight)
+        sizeLabel.Text = newWidth.."x"..newHeight
+    end, Color3.fromRGB(80, 220, 100), UDim2.new(1, -35, 0, 2.5), UDim2.new(0, 30, 0, 30), "lighten")
+    
+    return frame
 end
 
 return YUUGTRL
