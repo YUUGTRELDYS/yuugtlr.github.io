@@ -514,8 +514,6 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         self:RegisterTranslatable(Title, options.titleKey)
     end
     
-    local Content = self:CreateFrame(Main, UDim2.new(1, 0, 1, -(40 * scale)), UDim2.new(0, 0, 0, 40 * scale), currentTheme.MainColor, 0)
-    
     local SettingsBtn
     local CloseBtn
     
@@ -567,8 +565,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         CloseBtn = CloseBtn,
         elements = {},
         scale = scale,
-        options = options,
-        Content = Content
+        options = options
     }
     
     function window:SetMainColor(color)
@@ -604,19 +601,19 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     function window:CreateFrame(size, position, color, radius)
         local frameSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
         local framePos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
-        return YUUGTRL:CreateFrame(self.Content, frameSize, framePos, color, radius and radius * self.scale)
+        return YUUGTRL:CreateFrame(self.Main, frameSize, framePos, color, radius and radius * self.scale)
     end
     
     function window:CreateScrollingFrame(size, position, color, radius)
         local frameSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
         local framePos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
-        return YUUGTRL:CreateScrollingFrame(self.Content, frameSize, framePos, color, radius and radius * self.scale)
+        return YUUGTRL:CreateScrollingFrame(self.Main, frameSize, framePos, color, radius and radius * self.scale)
     end
     
     function window:CreateLabel(text, position, size, color, translationKey)
         local labelPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local labelSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        local label = YUUGTRL:CreateLabel(self.Content, text, labelPos, labelSize, color)
+        local label = YUUGTRL:CreateLabel(self.Main, text, labelPos, labelSize, color)
         label.TextSize = label.TextSize * self.scale
         if translationKey then
             YUUGTRL:RegisterTranslatable(label, translationKey)
@@ -628,7 +625,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     function window:CreateButton(text, callback, color, position, size, translationKey)
         local btnPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local btnSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        local btn = YUUGTRL:CreateButton(self.Content, text, callback, color, btnPos, btnSize)
+        local btn = YUUGTRL:CreateButton(self.Main, text, callback, color, btnPos, btnSize)
         btn.TextSize = btn.TextSize * self.scale
         if translationKey then
             YUUGTRL:RegisterTranslatable(btn, translationKey)
@@ -640,7 +637,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     function window:CreateSlider(text, min, max, default, callback, position, size)
         local sliderPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local sliderSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        return YUUGTRL:CreateSlider(self.Content, text, min, max, default, callback, sliderPos, sliderSize)
+        return YUUGTRL:CreateSlider(self.Main, text, min, max, default, callback, sliderPos, sliderSize)
     end
     
     function window:SetSettingsCallback(callback)
@@ -674,7 +671,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
             btnSize = UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale)
         end
         
-        local toggle = YUUGTRL:CreateButtonToggle(self.Content, text, default, callback, btnPos, btnSize, colors)
+        local toggle = YUUGTRL:CreateButtonToggle(self.Main, text, default, callback, btnPos, btnSize, colors)
         
         if translationKey and toggle and toggle.button then
             YUUGTRL:RegisterTranslatable(toggle.button, translationKey)
