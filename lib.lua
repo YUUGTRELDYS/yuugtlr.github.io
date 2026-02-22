@@ -138,10 +138,12 @@ local themes = {
     }
 }
 local currentTheme = themes.dark
+local themeOverrides = {}
 
 function YUUGTRL:SetTheme(themeName)
     if themes[themeName] then
         currentTheme = themes[themeName]
+        self:UpdateAllThemes()
         return true
     end
     return false
@@ -153,6 +155,64 @@ end
 
 function YUUGTRL:AddTheme(name, themeTable)
     themes[name] = themeTable
+end
+
+function YUUGTRL:OverrideThemeForObject(object, overrideTheme)
+    if object and overrideTheme then
+        themeOverrides[object] = overrideTheme
+        self:ApplyThemeToObject(object, overrideTheme)
+    end
+end
+
+function YUUGTRL:RemoveThemeOverride(object)
+    if object and themeOverrides[object] then
+        themeOverrides[object] = nil
+        self:ApplyThemeToObject(object, currentTheme)
+    end
+end
+
+function YUUGTRL:ApplyThemeToObject(object, theme)
+    if not object then return end
+    
+    if object:IsA("Frame") or object:IsA("ScrollingFrame") then
+        object.BackgroundColor3 = theme.FrameColor or theme.MainColor
+    elseif object:IsA("TextButton") then
+        object.BackgroundColor3 = theme.ButtonColor
+        local brighter = Color3.fromRGB(
+            math.min(theme.ButtonColor.R * 255 + 200, 255),
+            math.min(theme.ButtonColor.G * 255 + 200, 255),
+            math.min(theme.ButtonColor.B * 255 + 200, 255)
+        )
+        object.TextColor3 = brighter
+        
+        local gradient = object:FindFirstChildOfClass("UIGradient")
+        if gradient then
+            local darker = Color3.fromRGB(
+                math.max(theme.ButtonColor.R * 255 - 50, 0),
+                math.max(theme.ButtonColor.G * 255 - 50, 0),
+                math.max(theme.ButtonColor.B * 255 - 50, 0)
+            )
+            gradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, theme.ButtonColor),
+                ColorSequenceKeypoint.new(1, darker)
+            })
+        end
+    elseif object:IsA("TextLabel") then
+        object.TextColor3 = theme.TextColor
+    elseif object:IsA("TextBox") then
+        object.TextColor3 = theme.TextColor
+        object.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+    end
+end
+
+function YUUGTRL:UpdateAllThemes()
+    for object, overrideTheme in pairs(themeOverrides) do
+        if object and object.Parent then
+            self:ApplyThemeToObject(object, overrideTheme)
+        else
+            themeOverrides[object] = nil
+        end
+    end
 end
 
 function YUUGTRL:AddLanguage(name, translations)
