@@ -8,7 +8,7 @@ local viewportSize = workspace.CurrentCamera.ViewportSize
 
 local scale = 1
 if isMobile then
-    scale = math.min(viewportSize.X / 500, 1)
+    scale = math.min(viewportSize.X / 600, 0.9)
 end
 
 local splash = Instance.new("ScreenGui")
@@ -207,18 +207,18 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
     
     local btn = Create({
         type = "TextButton",
-        Size = size or UDim2.new(0, 120, 0, 35),
+        Size = size or UDim2.new(0, 120 * scale, 0, 35 * scale),
         Position = position or UDim2.new(0, 0, 0, 0),
         BackgroundColor3 = btnColor,
         Text = text or "Button",
         TextColor3 = Color3.fromRGB(255, 255, 255),
         Font = Enum.Font.GothamBold,
-        TextSize = 14,
+        TextSize = 14 * scale,
         Parent = parent
     })
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 8 * scale)
     corner.Parent = btn
     
     local darker = Color3.fromRGB(
@@ -324,17 +324,17 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     end
     
     local button = Instance.new("TextButton")
-    button.Size = size or UDim2.new(0, 120, 0, 35)
+    button.Size = size or UDim2.new(0, 120 * scale, 0, 35 * scale)
     button.Position = position or UDim2.new(0, 0, 0, 0)
     button.BackgroundColor3 = buttonColor
     button.Text = text or "Button"
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Font = Enum.Font.GothamBold
-    button.TextSize = 14
+    button.TextSize = 14 * scale
     button.Parent = parent
     
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
+    corner.CornerRadius = UDim.new(0, 8 * scale)
     corner.Parent = button
     
     local gradient = Instance.new("UIGradient")
@@ -460,7 +460,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     local screenSize = workspace.CurrentCamera.ViewportSize
     local scale = 1
     if isMobile then
-        scale = math.min(screenSize.X / 500, 1)
+        scale = math.min(screenSize.X / 600, 0.9)
     end
     
     local windowSize = size
@@ -691,14 +691,14 @@ function YUUGTRL:CreateFrame(parent, size, position, color, radius)
     if not parent then return end
     local frame = Create({
         type = "Frame",
-        Size = size or UDim2.new(0, 100, 0, 100),
+        Size = size or UDim2.new(0, 100 * scale, 0, 100 * scale),
         Position = position or UDim2.new(0, 0, 0, 0),
         BackgroundColor3 = color or currentTheme.FrameColor,
         BorderSizePixel = 0,
         Parent = parent
     })
     
-    Create({type = "UICorner",CornerRadius = UDim.new(0, radius or 12),Parent = frame})
+    Create({type = "UICorner",CornerRadius = UDim.new(0, radius or 12 * scale),Parent = frame})
     
     return frame
 end
@@ -706,12 +706,12 @@ end
 function YUUGTRL:CreateScrollingFrame(parent, size, position, color, radius)
     if not parent then return end
     local frame = Instance.new("ScrollingFrame")
-    frame.Size = size or UDim2.new(0, 200, 0, 200)
+    frame.Size = size or UDim2.new(0, 200 * scale, 0, 200 * scale)
     frame.Position = position or UDim2.new(0, 0, 0, 0)
     frame.BackgroundColor3 = color or currentTheme.FrameColor
     frame.BackgroundTransparency = 0
     frame.BorderSizePixel = 0
-    frame.ScrollBarThickness = 4
+    frame.ScrollBarThickness = 4 * scale
     frame.ScrollBarImageColor3 = currentTheme.ScrollBarColor
     frame.CanvasSize = UDim2.new(0, 0, 0, 0)
     frame.AutomaticCanvasSize = Enum.AutomaticSize.Y
@@ -719,7 +719,7 @@ function YUUGTRL:CreateScrollingFrame(parent, size, position, color, radius)
     
     if radius then
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, radius)
+        corner.CornerRadius = UDim.new(0, radius or 12 * scale)
         corner.Parent = frame
     end
     
@@ -730,13 +730,13 @@ function YUUGTRL:CreateLabel(parent, text, position, size, color)
     if not parent then return end
     return Create({
         type = "TextLabel",
-        Size = size or UDim2.new(0, 100, 0, 30),
+        Size = size or UDim2.new(0, 100 * scale, 0, 30 * scale),
         Position = position or UDim2.new(0, 0, 0, 0),
         BackgroundTransparency = 1,
         Text = text or "Label",
         TextColor3 = color or currentTheme.TextColor,
         Font = Enum.Font.GothamBold,
-        TextSize = 14,
+        TextSize = 14 * scale,
         TextXAlignment = Enum.TextXAlignment.Left,
         Parent = parent
     })
@@ -744,16 +744,16 @@ end
 
 function YUUGTRL:CreateSlider(parent, text, min, max, default, callback, position, size)
     if not parent then return end
-    local frame = self:CreateFrame(parent, size or UDim2.new(0, 200, 0, 50), position, currentTheme.FrameColor, 8)
+    local frame = self:CreateFrame(parent, size or UDim2.new(0, 200 * scale, 0, 50 * scale), position, currentTheme.FrameColor, 8 * scale)
     
-    self:CreateLabel(frame, text or "", UDim2.new(0, 10, 0, 5), UDim2.new(1, -60, 0, 20))
+    self:CreateLabel(frame, text or "", UDim2.new(0, 10 * scale, 0, 5 * scale), UDim2.new(1, -60 * scale, 0, 20 * scale))
     
-    local valueLabel = self:CreateLabel(frame, tostring(default or 0), UDim2.new(1, -50, 0, 5), UDim2.new(0, 40, 0, 20))
+    local valueLabel = self:CreateLabel(frame, tostring(default or 0), UDim2.new(1, -50 * scale, 0, 5 * scale), UDim2.new(0, 40 * scale, 0, 20 * scale))
     valueLabel.TextXAlignment = Enum.TextXAlignment.Right
     
-    local slider = self:CreateFrame(frame, UDim2.new(1, -20, 0, 8), UDim2.new(0, 10, 0, 30), Color3.fromRGB(60, 60, 70), 4)
+    local slider = self:CreateFrame(frame, UDim2.new(1, -20 * scale, 0, 8 * scale), UDim2.new(0, 10 * scale, 0, 30 * scale), Color3.fromRGB(60, 60, 70), 4 * scale)
     
-    local fill = self:CreateFrame(slider, UDim2.new((default or 0) / max, 0, 1, 0), UDim2.new(0, 0, 0, 0), currentTheme.AccentColor, 4)
+    local fill = self:CreateFrame(slider, UDim2.new((default or 0) / max, 0, 1, 0), UDim2.new(0, 0, 0, 0), currentTheme.AccentColor, 4 * scale)
     
     local dragging = false
     
