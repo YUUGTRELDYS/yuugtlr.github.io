@@ -259,17 +259,20 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
     gradient.Rotation = 90
     gradient.Parent = btn
 
-    local brighter = Color3.fromRGB(
-        math.min(btnColor.R * 255 + 200, 255),
-        math.min(btnColor.G * 255 + 200, 255),
-        math.min(btnColor.B * 255 + 200, 255)
-    )
-    
-    if IsEmojiOrSymbol(text) then
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    else
-        btn.TextColor3 = brighter
+    local function updateTextColor()
+        if IsEmojiOrSymbol(btn.Text) then
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        else
+            local brighter = Color3.fromRGB(
+                math.min(btnColor.R * 255 + 200, 255),
+                math.min(btnColor.G * 255 + 200, 255),
+                math.min(btnColor.B * 255 + 200, 255)
+            )
+            btn.TextColor3 = brighter
+        end
     end
+    
+    updateTextColor()
 
     btn.MouseEnter:Connect(function()
         local hoverColor = Color3.fromRGB(
@@ -296,9 +299,11 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
             ColorSequenceKeypoint.new(0, btnColor),
             ColorSequenceKeypoint.new(1, darker)
         })
-        if not IsEmojiOrSymbol(btn.Text) then
-            btn.TextColor3 = brighter
-        end
+        updateTextColor()
+    end)
+
+    btn:GetPropertyChangedSignal("Text"):Connect(function()
+        updateTextColor()
     end)
 
     if callback then
@@ -343,6 +348,12 @@ function YUUGTRL:CreateHideButton(parent, text, callback, position, size)
     gradient.Rotation = 90
     gradient.Parent = btn
 
+    local function updateTextColor()
+        if IsEmojiOrSymbol(btn.Text) then
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
+    end
+
     btn.MouseEnter:Connect(function()
         local hoverColor = Color3.fromRGB(
             math.min(btnColor.R * 255 + 30, 255),
@@ -365,6 +376,10 @@ function YUUGTRL:CreateHideButton(parent, text, callback, position, size)
             ColorSequenceKeypoint.new(0, btnColor),
             ColorSequenceKeypoint.new(1, darker)
         })
+    end)
+
+    btn:GetPropertyChangedSignal("Text"):Connect(function()
+        updateTextColor()
     end)
 
     if callback then
@@ -404,12 +419,12 @@ function YUUGTRL:RestoreButtonStyle(button, color)
             ColorSequenceKeypoint.new(0, color),
             ColorSequenceKeypoint.new(1, darker)
         })
-        local brighter = Color3.fromRGB(
-            math.min(color.R * 255 + 200, 255),
-            math.min(color.G * 255 + 200, 255),
-            math.min(color.B * 255 + 200, 255)
-        )
         if not IsEmojiOrSymbol(button.Text) then
+            local brighter = Color3.fromRGB(
+                math.min(color.R * 255 + 200, 255),
+                math.min(color.G * 255 + 200, 255),
+                math.min(color.B * 255 + 200, 255)
+            )
             button.TextColor3 = brighter
         end
     end
@@ -444,11 +459,28 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     gradient.Rotation = 90
     gradient.Parent = button
 
-    local brighter = Color3.fromRGB(
-        math.min(buttonColor.R * 255 + 200, 255),
-        math.min(buttonColor.G * 255 + 200, 255),
-        math.min(buttonColor.B * 255 + 200, 255)
-    )
+    local function updateTextColor()
+        if IsEmojiOrSymbol(button.Text) then
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            return
+        end
+        
+        local currentColor = buttonColor
+        if isOn then
+            button.TextColor3 = Color3.fromRGB(
+                math.min(currentColor.R * 255 + 230, 255),
+                math.min(currentColor.G * 255 + 230, 255),
+                math.min(currentColor.B * 255 + 230, 255)
+            )
+        else
+            local brighter = Color3.fromRGB(
+                math.min(currentColor.R * 255 + 200, 255),
+                math.min(currentColor.G * 255 + 200, 255),
+                math.min(currentColor.B * 255 + 200, 255)
+            )
+            button.TextColor3 = brighter
+        end
+    end
 
     local function updateGradient()
         local grad = button:FindFirstChildOfClass("UIGradient")
@@ -471,17 +503,7 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
             ColorSequenceKeypoint.new(1, darker2)
         })
 
-        if not IsEmojiOrSymbol(button.Text) then
-            if isOn then
-                button.TextColor3 = Color3.fromRGB(
-                    math.min(currentColor.R * 255 + 230, 255),
-                    math.min(currentColor.G * 255 + 230, 255),
-                    math.min(currentColor.B * 255 + 230, 255)
-                )
-            else
-                button.TextColor3 = brighter
-            end
-        end
+        updateTextColor()
     end
 
     updateGradient()
@@ -514,6 +536,10 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
 
     button.MouseLeave:Connect(function()
         updateGradient()
+    end)
+
+    button:GetPropertyChangedSignal("Text"):Connect(function()
+        updateTextColor()
     end)
 
     button.MouseButton1Click:Connect(function()
@@ -630,7 +656,7 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     end
 
     if options.ShowClose ~= false then
-        CloseBtn = self:CreateButton(Header, "X", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -35 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale))
+        CloseBtn = self:CreateButton(Header, "✕", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -35 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale))
     end
 
     if options.ShowHide ~= false then
