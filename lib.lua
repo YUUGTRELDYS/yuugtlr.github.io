@@ -214,6 +214,13 @@ local function Create(props)
     return obj
 end
 
+local function IsEmojiOrSymbol(text)
+    if not text then return false end
+    local emojiPattern = "[\226-\231][\128-\191]+"
+    local symbolPattern = "[!@#$%%^&*()_+=\\-\\[\\]{}|;:',.<>?/~`]"
+    return string.find(text, emojiPattern) or string.find(text, symbolPattern)
+end
+
 function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
     if not parent then return end
 
@@ -254,7 +261,12 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
         math.min(btnColor.G * 255 + 200, 255),
         math.min(btnColor.B * 255 + 200, 255)
     )
-    btn.TextColor3 = brighter
+    
+    if IsEmojiOrSymbol(text) then
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    else
+        btn.TextColor3 = brighter
+    end
 
     btn.MouseEnter:Connect(function()
         local hoverColor = Color3.fromRGB(
@@ -271,6 +283,9 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
             ColorSequenceKeypoint.new(0, hoverColor),
             ColorSequenceKeypoint.new(1, hoverDarker)
         })
+        if not IsEmojiOrSymbol(btn.Text) then
+            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
     end)
 
     btn.MouseLeave:Connect(function()
@@ -278,6 +293,9 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
             ColorSequenceKeypoint.new(0, btnColor),
             ColorSequenceKeypoint.new(1, darker)
         })
+        if not IsEmojiOrSymbol(btn.Text) then
+            btn.TextColor3 = brighter
+        end
     end)
 
     if callback then
@@ -322,7 +340,9 @@ function YUUGTRL:RestoreButtonStyle(button, color)
             math.min(color.G * 255 + 200, 255),
             math.min(color.B * 255 + 200, 255)
         )
-        button.TextColor3 = brighter
+        if not IsEmojiOrSymbol(button.Text) then
+            button.TextColor3 = brighter
+        end
     end
 end
 
@@ -382,14 +402,16 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
             ColorSequenceKeypoint.new(1, darker2)
         })
 
-        if isOn then
-            button.TextColor3 = Color3.fromRGB(
-                math.min(currentColor.R * 255 + 230, 255),
-                math.min(currentColor.G * 255 + 230, 255),
-                math.min(currentColor.B * 255 + 230, 255)
-            )
-        else
-            button.TextColor3 = brighter
+        if not IsEmojiOrSymbol(button.Text) then
+            if isOn then
+                button.TextColor3 = Color3.fromRGB(
+                    math.min(currentColor.R * 255 + 230, 255),
+                    math.min(currentColor.G * 255 + 230, 255),
+                    math.min(currentColor.B * 255 + 230, 255)
+                )
+            else
+                button.TextColor3 = brighter
+            end
         end
     end
 
@@ -416,7 +438,9 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
             })
         end
 
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        if not IsEmojiOrSymbol(button.Text) then
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
     end)
 
     button.MouseLeave:Connect(function()
@@ -528,14 +552,16 @@ function YUUGTRL:CreateAntiSitButton(parent, text, default, callback, position, 
             ColorSequenceKeypoint.new(1, darker2)
         })
 
-        if antiSitEnabled then
-            button.TextColor3 = Color3.fromRGB(
-                math.min(currentColor.R * 255 + 230, 255),
-                math.min(currentColor.G * 255 + 230, 255),
-                math.min(currentColor.B * 255 + 230, 255)
-            )
-        else
-            button.TextColor3 = brighter
+        if not IsEmojiOrSymbol(button.Text) then
+            if antiSitEnabled then
+                button.TextColor3 = Color3.fromRGB(
+                    math.min(currentColor.R * 255 + 230, 255),
+                    math.min(currentColor.G * 255 + 230, 255),
+                    math.min(currentColor.B * 255 + 230, 255)
+                )
+            else
+                button.TextColor3 = brighter
+            end
         end
     end
 
@@ -599,7 +625,9 @@ function YUUGTRL:CreateAntiSitButton(parent, text, default, callback, position, 
             })
         end
 
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        if not IsEmojiOrSymbol(button.Text) then
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
     end)
 
     button.MouseLeave:Connect(function()
@@ -793,14 +821,16 @@ function YUUGTRL:CreateWalkFlingButton(parent, text, default, callback, position
             ColorSequenceKeypoint.new(1, darker2)
         })
 
-        if walkFlingEnabled then
-            button.TextColor3 = Color3.fromRGB(
-                math.min(currentColor.R * 255 + 230, 255),
-                math.min(currentColor.G * 255 + 230, 255),
-                math.min(currentColor.B * 255 + 230, 255)
-            )
-        else
-            button.TextColor3 = brighter
+        if not IsEmojiOrSymbol(button.Text) then
+            if walkFlingEnabled then
+                button.TextColor3 = Color3.fromRGB(
+                    math.min(currentColor.R * 255 + 230, 255),
+                    math.min(currentColor.G * 255 + 230, 255),
+                    math.min(currentColor.B * 255 + 230, 255)
+                )
+            else
+                button.TextColor3 = brighter
+            end
         end
     end
 
@@ -827,7 +857,9 @@ function YUUGTRL:CreateWalkFlingButton(parent, text, default, callback, position
             })
         end
 
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        if not IsEmojiOrSymbol(button.Text) then
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
     end)
 
     button.MouseLeave:Connect(function()
@@ -1284,20 +1316,6 @@ function YUUGTRL:CreateSlider(parent, text, min, max, default, callback, positio
     end)
 
     return slider
-end
-
-function YUUGTRL:DestroyAllAntiSit()
-    for _, obj in ipairs(antiSitInstances) do
-        pcall(function() obj:Destroy() end)
-    end
-    antiSitInstances = {}
-end
-
-function YUUGTRL:DestroyAllWalkFling()
-    for _, obj in ipairs(walkFlingInstances) do
-        pcall(function() obj:Destroy() end)
-    end
-    walkFlingInstances = {}
 end
 
 return YUUGTRL
