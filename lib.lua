@@ -94,7 +94,6 @@ local themes = {
         TextColor = Color3.fromRGB(255, 255, 255),
         AccentColor = Color3.fromRGB(80, 100, 220),
         ButtonColor = Color3.fromRGB(60, 100, 200),
-        HideButtonColor = Color3.fromRGB(100, 180, 255),
         FrameColor = Color3.fromRGB(35, 35, 45),
         InputColor = Color3.fromRGB(40, 40, 50),
         ScrollBarColor = Color3.fromRGB(100, 100, 150),
@@ -108,7 +107,6 @@ local themes = {
         TextColor = Color3.fromRGB(255, 255, 255),
         AccentColor = Color3.fromRGB(100, 100, 100),
         ButtonColor = Color3.fromRGB(80, 80, 80),
-        HideButtonColor = Color3.fromRGB(120, 200, 255),
         FrameColor = Color3.fromRGB(15, 15, 15),
         InputColor = Color3.fromRGB(25, 25, 25),
         ScrollBarColor = Color3.fromRGB(150, 150, 150),
@@ -122,7 +120,6 @@ local themes = {
         TextColor = Color3.fromRGB(255, 255, 255),
         AccentColor = Color3.fromRGB(160, 90, 255),
         ButtonColor = Color3.fromRGB(140, 70, 230),
-        HideButtonColor = Color3.fromRGB(200, 150, 255),
         FrameColor = Color3.fromRGB(30, 25, 40),
         InputColor = Color3.fromRGB(35, 30, 45),
         ScrollBarColor = Color3.fromRGB(180, 120, 255),
@@ -259,20 +256,17 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
     gradient.Rotation = 90
     gradient.Parent = btn
 
-    local function updateTextColor()
-        if IsEmojiOrSymbol(btn.Text) then
-            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        else
-            local brighter = Color3.fromRGB(
-                math.min(btnColor.R * 255 + 200, 255),
-                math.min(btnColor.G * 255 + 200, 255),
-                math.min(btnColor.B * 255 + 200, 255)
-            )
-            btn.TextColor3 = brighter
-        end
-    end
+    local brighter = Color3.fromRGB(
+        math.min(btnColor.R * 255 + 200, 255),
+        math.min(btnColor.G * 255 + 200, 255),
+        math.min(btnColor.B * 255 + 200, 255)
+    )
     
-    updateTextColor()
+    if IsEmojiOrSymbol(text) then
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    else
+        btn.TextColor3 = brighter
+    end
 
     btn.MouseEnter:Connect(function()
         local hoverColor = Color3.fromRGB(
@@ -299,87 +293,9 @@ function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
             ColorSequenceKeypoint.new(0, btnColor),
             ColorSequenceKeypoint.new(1, darker)
         })
-        updateTextColor()
-    end)
-
-    btn:GetPropertyChangedSignal("Text"):Connect(function()
-        updateTextColor()
-    end)
-
-    if callback then
-        btn.MouseButton1Click:Connect(callback)
-    end
-
-    return btn
-end
-
-function YUUGTRL:CreateHideButton(parent, text, callback, position, size)
-    if not parent then return end
-
-    local btnColor = currentTheme.HideButtonColor
-
-    local btn = Create({
-        type = "TextButton",
-        Size = size or UDim2.new(0, 30 * scale, 0, 30 * scale),
-        Position = position or UDim2.new(1, -70 * scale, 0, 5 * scale),
-        BackgroundColor3 = btnColor,
-        Text = text or "◀",
-        TextColor3 = Color3.fromRGB(255, 255, 255),
-        Font = Enum.Font.GothamBold,
-        TextSize = 16 * scale,
-        Parent = parent
-    })
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8 * scale)
-    corner.Parent = btn
-
-    local darker = Color3.fromRGB(
-        math.max(btnColor.R * 255 - 40, 0),
-        math.max(btnColor.G * 255 - 40, 0),
-        math.max(btnColor.B * 255 - 40, 0)
-    )
-
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, btnColor),
-        ColorSequenceKeypoint.new(1, darker)
-    })
-    gradient.Rotation = 90
-    gradient.Parent = btn
-
-    local function updateTextColor()
-        if IsEmojiOrSymbol(btn.Text) then
-            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        if not IsEmojiOrSymbol(btn.Text) then
+            btn.TextColor3 = brighter
         end
-    end
-
-    btn.MouseEnter:Connect(function()
-        local hoverColor = Color3.fromRGB(
-            math.min(btnColor.R * 255 + 30, 255),
-            math.min(btnColor.G * 255 + 30, 255),
-            math.min(btnColor.B * 255 + 30, 255)
-        )
-        local hoverDarker = Color3.fromRGB(
-            math.max(hoverColor.R * 255 - 40, 0),
-            math.max(hoverColor.G * 255 - 40, 0),
-            math.max(hoverColor.B * 255 - 40, 0)
-        )
-        gradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, hoverColor),
-            ColorSequenceKeypoint.new(1, hoverDarker)
-        })
-    end)
-
-    btn.MouseLeave:Connect(function()
-        gradient.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, btnColor),
-            ColorSequenceKeypoint.new(1, darker)
-        })
-    end)
-
-    btn:GetPropertyChangedSignal("Text"):Connect(function()
-        updateTextColor()
     end)
 
     if callback then
@@ -419,12 +335,12 @@ function YUUGTRL:RestoreButtonStyle(button, color)
             ColorSequenceKeypoint.new(0, color),
             ColorSequenceKeypoint.new(1, darker)
         })
+        local brighter = Color3.fromRGB(
+            math.min(color.R * 255 + 200, 255),
+            math.min(color.G * 255 + 200, 255),
+            math.min(color.B * 255 + 200, 255)
+        )
         if not IsEmojiOrSymbol(button.Text) then
-            local brighter = Color3.fromRGB(
-                math.min(color.R * 255 + 200, 255),
-                math.min(color.G * 255 + 200, 255),
-                math.min(color.B * 255 + 200, 255)
-            )
             button.TextColor3 = brighter
         end
     end
@@ -459,28 +375,11 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     gradient.Rotation = 90
     gradient.Parent = button
 
-    local function updateTextColor()
-        if IsEmojiOrSymbol(button.Text) then
-            button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            return
-        end
-        
-        local currentColor = buttonColor
-        if isOn then
-            button.TextColor3 = Color3.fromRGB(
-                math.min(currentColor.R * 255 + 230, 255),
-                math.min(currentColor.G * 255 + 230, 255),
-                math.min(currentColor.B * 255 + 230, 255)
-            )
-        else
-            local brighter = Color3.fromRGB(
-                math.min(currentColor.R * 255 + 200, 255),
-                math.min(currentColor.G * 255 + 200, 255),
-                math.min(currentColor.B * 255 + 200, 255)
-            )
-            button.TextColor3 = brighter
-        end
-    end
+    local brighter = Color3.fromRGB(
+        math.min(buttonColor.R * 255 + 200, 255),
+        math.min(buttonColor.G * 255 + 200, 255),
+        math.min(buttonColor.B * 255 + 200, 255)
+    )
 
     local function updateGradient()
         local grad = button:FindFirstChildOfClass("UIGradient")
@@ -503,7 +402,17 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
             ColorSequenceKeypoint.new(1, darker2)
         })
 
-        updateTextColor()
+        if not IsEmojiOrSymbol(button.Text) then
+            if isOn then
+                button.TextColor3 = Color3.fromRGB(
+                    math.min(currentColor.R * 255 + 230, 255),
+                    math.min(currentColor.G * 255 + 230, 255),
+                    math.min(currentColor.B * 255 + 230, 255)
+                )
+            else
+                button.TextColor3 = brighter
+            end
+        end
     end
 
     updateGradient()
@@ -536,10 +445,6 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
 
     button.MouseLeave:Connect(function()
         updateGradient()
-    end)
-
-    button:GetPropertyChangedSignal("Text"):Connect(function()
-        updateTextColor()
     end)
 
     button.MouseButton1Click:Connect(function()
@@ -585,6 +490,454 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     toggleObject.button = button
 
     return toggleObject
+end
+
+local antiSitInstances = {}
+local walkFlingInstances = {}
+
+function YUUGTRL:CreateAntiSitButton(parent, text, default, callback, position, size, colors)
+    if not parent then return end
+
+    local antiSitEnabled = default or false
+    local antiSitConnection = nil
+
+    local colors = colors or {}
+    local buttonColor = colors.off or currentTheme.ButtonColor
+    if colors.on then
+        buttonColor = colors.on
+    end
+
+    local button = Instance.new("TextButton")
+    button.Size = size or UDim2.new(0, 140 * scale, 0, 40 * scale)
+    button.Position = position or UDim2.new(0, 0, 0, 0)
+    button.BackgroundColor3 = buttonColor
+    button.Text = text or "ANTI SIT"
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14 * scale
+    button.Parent = parent
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8 * scale)
+    corner.Parent = button
+
+    local gradient = Instance.new("UIGradient")
+    gradient.Rotation = 90
+    gradient.Parent = button
+
+    local brighter = Color3.fromRGB(
+        math.min(buttonColor.R * 255 + 200, 255),
+        math.min(buttonColor.G * 255 + 200, 255),
+        math.min(buttonColor.B * 255 + 200, 255)
+    )
+
+    local function updateGradient()
+        local grad = button:FindFirstChildOfClass("UIGradient")
+        if not grad then
+            grad = Instance.new("UIGradient")
+            grad.Rotation = 90
+            grad.Parent = button
+        end
+
+        local currentColor = buttonColor
+        local darkAmount = antiSitEnabled and 70 or 50
+        local darker2 = Color3.fromRGB(
+            math.max(currentColor.R * 255 - darkAmount, 0),
+            math.max(currentColor.G * 255 - darkAmount, 0),
+            math.max(currentColor.B * 255 - darkAmount, 0)
+        )
+
+        grad.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, antiSitEnabled and darker2 or currentColor),
+            ColorSequenceKeypoint.new(1, darker2)
+        })
+
+        if not IsEmojiOrSymbol(button.Text) then
+            if antiSitEnabled then
+                button.TextColor3 = Color3.fromRGB(
+                    math.min(currentColor.R * 255 + 230, 255),
+                    math.min(currentColor.G * 255 + 230, 255),
+                    math.min(currentColor.B * 255 + 230, 255)
+                )
+            else
+                button.TextColor3 = brighter
+            end
+        end
+    end
+
+    local function updateCharacter()
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            return char.Humanoid
+        end
+        return nil
+    end
+
+    local function startAntiSit()
+        local humanoid = updateCharacter()
+        if humanoid then
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+        end
+
+        if antiSitConnection then antiSitConnection:Disconnect() end
+        antiSitConnection = RunService.Heartbeat:Connect(function()
+            local char = player.Character
+            if char and char:FindFirstChild("Humanoid") then
+                local hum = char.Humanoid
+                if hum:GetState() == Enum.HumanoidStateType.Seated then
+                    hum:ChangeState(Enum.HumanoidStateType.Running)
+                end
+            end
+        end)
+    end
+
+    local function stopAntiSit()
+        if antiSitConnection then
+            antiSitConnection:Disconnect()
+            antiSitConnection = nil
+        end
+        local humanoid = updateCharacter()
+        if humanoid then
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+        end
+    end
+
+    updateGradient()
+
+    button.MouseEnter:Connect(function()
+        local currentColor = buttonColor
+        local hoverColor = Color3.fromRGB(
+            math.min(currentColor.R * 255 + 30, 255),
+            math.min(currentColor.G * 255 + 30, 255),
+            math.min(currentColor.B * 255 + 30, 255)
+        )
+        local hoverDarker = Color3.fromRGB(
+            math.max(hoverColor.R * 255 - 50, 0),
+            math.max(hoverColor.G * 255 - 50, 0),
+            math.max(hoverColor.B * 255 - 50, 0)
+        )
+
+        local grad = button:FindFirstChildOfClass("UIGradient")
+        if grad then
+            grad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, hoverColor),
+                ColorSequenceKeypoint.new(1, hoverDarker)
+            })
+        end
+
+        if not IsEmojiOrSymbol(button.Text) then
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
+    end)
+
+    button.MouseLeave:Connect(function()
+        updateGradient()
+    end)
+
+    button.MouseButton1Click:Connect(function()
+        antiSitEnabled = not antiSitEnabled
+        if antiSitEnabled then
+            startAntiSit()
+        else
+            stopAntiSit()
+        end
+        updateGradient()
+        if callback then
+            pcall(callback, antiSitEnabled)
+        end
+    end)
+
+    player.CharacterAdded:Connect(function()
+        if antiSitEnabled then
+            task.wait(0.5)
+            local char = player.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+            end
+        end
+    end)
+
+    local antiSitObject = {}
+
+    function antiSitObject:SetState(state)
+        antiSitEnabled = state
+        if antiSitEnabled then
+            startAntiSit()
+        else
+            stopAntiSit()
+        end
+        updateGradient()
+        if callback then pcall(callback, antiSitEnabled) end
+    end
+
+    function antiSitObject:GetState()
+        return antiSitEnabled
+    end
+
+    function antiSitObject:Toggle()
+        antiSitEnabled = not antiSitEnabled
+        if antiSitEnabled then
+            startAntiSit()
+        else
+            stopAntiSit()
+        end
+        updateGradient()
+        if callback then pcall(callback, antiSitEnabled) end
+    end
+
+    function antiSitObject:SetText(newText)
+        button.Text = newText
+    end
+
+    function antiSitObject:SetColors(newColors)
+        if newColors.on then buttonColor = newColors.on end
+        if newColors.off then buttonColor = newColors.off end
+        updateGradient()
+    end
+
+    function antiSitObject:Destroy()
+        if antiSitConnection then antiSitConnection:Disconnect() end
+        button:Destroy()
+    end
+
+    antiSitObject.button = button
+    table.insert(antiSitInstances, antiSitObject)
+
+    return antiSitObject
+end
+
+function YUUGTRL:CreateWalkFlingButton(parent, text, default, callback, position, size, colors)
+    if not parent then return end
+
+    local walkFlingEnabled = default or false
+    local walkFlingConnection = nil
+    local jumpConnection = nil
+    local character = nil
+    local root = nil
+    local humanoid = nil
+
+    local colors = colors or {}
+    local buttonColor = colors.off or currentTheme.ButtonColor
+    if colors.on then
+        buttonColor = colors.on
+    end
+
+    local button = Instance.new("TextButton")
+    button.Size = size or UDim2.new(0, 140 * scale, 0, 40 * scale)
+    button.Position = position or UDim2.new(0, 0, 0, 0)
+    button.BackgroundColor3 = buttonColor
+    button.Text = text or "WALK FLING"
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 14 * scale
+    button.Parent = parent
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8 * scale)
+    corner.Parent = button
+
+    local gradient = Instance.new("UIGradient")
+    gradient.Rotation = 90
+    gradient.Parent = button
+
+    local brighter = Color3.fromRGB(
+        math.min(buttonColor.R * 255 + 200, 255),
+        math.min(buttonColor.G * 255 + 200, 255),
+        math.min(buttonColor.B * 255 + 200, 255)
+    )
+
+    local function updateCharacter()
+        character = player.Character
+        if character then
+            root = character:FindFirstChild("HumanoidRootPart")
+            humanoid = character:FindFirstChild("Humanoid")
+        end
+    end
+
+    local function startWalkFling()
+        updateCharacter()
+        if not character or not root or not humanoid then return end
+
+        root.CanCollide = false
+        humanoid:ChangeState(11)
+
+        if jumpConnection then jumpConnection:Disconnect() end
+        jumpConnection = UserInputService.JumpRequest:Connect(function()
+            if humanoid and humanoid.Health > 0 then
+                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+
+        if walkFlingConnection then walkFlingConnection:Disconnect() end
+
+        walkFlingConnection = RunService.Heartbeat:Connect(function()
+            if not walkFlingEnabled or not root or not humanoid then return end
+            if humanoid.Health <= 0 then 
+                walkFlingEnabled = false 
+                updateGradient()
+                return 
+            end
+
+            local vel = root.Velocity
+            root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+            RunService.RenderStepped:Wait()
+            if root then root.Velocity = vel end
+            RunService.Stepped:Wait()
+            if root then root.Velocity = vel + Vector3.new(0, 0.1, 0) end
+        end)
+    end
+
+    local function stopWalkFling()
+        if walkFlingConnection then 
+            walkFlingConnection:Disconnect() 
+            walkFlingConnection = nil 
+        end
+        if jumpConnection then 
+            jumpConnection:Disconnect() 
+            jumpConnection = nil 
+        end
+        if root then root.CanCollide = true end
+        if humanoid then humanoid:ChangeState(Enum.HumanoidStateType.Running) end
+    end
+
+    local function updateGradient()
+        local grad = button:FindFirstChildOfClass("UIGradient")
+        if not grad then
+            grad = Instance.new("UIGradient")
+            grad.Rotation = 90
+            grad.Parent = button
+        end
+
+        local currentColor = buttonColor
+        local darkAmount = walkFlingEnabled and 70 or 50
+        local darker2 = Color3.fromRGB(
+            math.max(currentColor.R * 255 - darkAmount, 0),
+            math.max(currentColor.G * 255 - darkAmount, 0),
+            math.max(currentColor.B * 255 - darkAmount, 0)
+        )
+
+        grad.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, walkFlingEnabled and darker2 or currentColor),
+            ColorSequenceKeypoint.new(1, darker2)
+        })
+
+        if not IsEmojiOrSymbol(button.Text) then
+            if walkFlingEnabled then
+                button.TextColor3 = Color3.fromRGB(
+                    math.min(currentColor.R * 255 + 230, 255),
+                    math.min(currentColor.G * 255 + 230, 255),
+                    math.min(currentColor.B * 255 + 230, 255)
+                )
+            else
+                button.TextColor3 = brighter
+            end
+        end
+    end
+
+    updateGradient()
+
+    button.MouseEnter:Connect(function()
+        local currentColor = buttonColor
+        local hoverColor = Color3.fromRGB(
+            math.min(currentColor.R * 255 + 30, 255),
+            math.min(currentColor.G * 255 + 30, 255),
+            math.min(currentColor.B * 255 + 30, 255)
+        )
+        local hoverDarker = Color3.fromRGB(
+            math.max(hoverColor.R * 255 - 50, 0),
+            math.max(hoverColor.G * 255 - 50, 0),
+            math.max(hoverColor.B * 255 - 50, 0)
+        )
+
+        local grad = button:FindFirstChildOfClass("UIGradient")
+        if grad then
+            grad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, hoverColor),
+                ColorSequenceKeypoint.new(1, hoverDarker)
+            })
+        end
+
+        if not IsEmojiOrSymbol(button.Text) then
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end
+    end)
+
+    button.MouseLeave:Connect(function()
+        updateGradient()
+    end)
+
+    button.MouseButton1Click:Connect(function()
+        walkFlingEnabled = not walkFlingEnabled
+        if walkFlingEnabled then
+            startWalkFling()
+        else
+            stopWalkFling()
+        end
+        updateGradient()
+        if callback then
+            pcall(callback, walkFlingEnabled)
+        end
+    end)
+
+    player.CharacterAdded:Connect(function(newChar)
+        character = newChar
+        task.wait(0.5)
+        root = character:FindFirstChild("HumanoidRootPart")
+        humanoid = character:FindFirstChild("Humanoid")
+        if walkFlingEnabled and root and humanoid then
+            root.CanCollide = false
+            humanoid:ChangeState(11)
+        end
+    end)
+
+    local walkFlingObject = {}
+
+    function walkFlingObject:SetState(state)
+        walkFlingEnabled = state
+        if walkFlingEnabled then
+            startWalkFling()
+        else
+            stopWalkFling()
+        end
+        updateGradient()
+        if callback then pcall(callback, walkFlingEnabled) end
+    end
+
+    function walkFlingObject:GetState()
+        return walkFlingEnabled
+    end
+
+    function walkFlingObject:Toggle()
+        walkFlingEnabled = not walkFlingEnabled
+        if walkFlingEnabled then
+            startWalkFling()
+        else
+            stopWalkFling()
+        end
+        updateGradient()
+        if callback then pcall(callback, walkFlingEnabled) end
+    end
+
+    function walkFlingObject:SetText(newText)
+        button.Text = newText
+    end
+
+    function walkFlingObject:SetColors(newColors)
+        if newColors.on then buttonColor = newColors.on end
+        if newColors.off then buttonColor = newColors.off end
+        updateGradient()
+    end
+
+    function walkFlingObject:Destroy()
+        if walkFlingConnection then walkFlingConnection:Disconnect() end
+        if jumpConnection then jumpConnection:Disconnect() end
+        button:Destroy()
+    end
+
+    walkFlingObject.button = button
+    table.insert(walkFlingInstances, walkFlingObject)
+
+    return walkFlingObject
 end
 
 function YUUGTRL:CreateWindow(title, size, position, options)
@@ -649,18 +1002,16 @@ function YUUGTRL:CreateWindow(title, size, position, options)
 
     local SettingsBtn
     local CloseBtn
-    local HideBtn
 
     if options.ShowSettings ~= false then
         SettingsBtn = self:CreateButton(Header, "⚙", nil, options.AccentColor or currentTheme.AccentColor, UDim2.new(1, -70 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale))
     end
 
     if options.ShowClose ~= false then
-        CloseBtn = self:CreateButton(Header, "✕", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -35 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale))
-    end
-
-    if options.ShowHide ~= false then
-        HideBtn = self:CreateHideButton(Header, options.HideSymbol or "◀", nil, UDim2.new(1, -105 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale))
+        CloseBtn = self:CreateButton(Header, "X", nil, options.CloseColor or Color3.fromRGB(255, 100, 100), UDim2.new(1, -35 * scale, 0, 5 * scale), UDim2.new(0, 30 * scale, 0, 30 * scale))
+        CloseBtn.MouseButton1Click:Connect(function() 
+            ScreenGui:Destroy() 
+        end)
     end
 
     local dragging, dragInput, dragStart, startPos
@@ -698,7 +1049,6 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         Title = Title,
         SettingsBtn = SettingsBtn,
         CloseBtn = CloseBtn,
-        HideBtn = HideBtn,
         elements = {},
         scale = scale,
         options = options
@@ -770,12 +1120,6 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return btn
     end
 
-    function window:CreateHideButton(text, callback, position, size)
-        local btnPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
-        local btnSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
-        return YUUGTRL:CreateHideButton(self.Main, text, callback, btnPos, btnSize)
-    end
-
     function window:CreateSlider(text, min, max, default, callback, position, size)
         local sliderPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
         local sliderSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
@@ -791,12 +1135,6 @@ function YUUGTRL:CreateWindow(title, size, position, options)
     function window:SetCloseCallback(callback)
         if CloseBtn then
             CloseBtn.MouseButton1Click:Connect(callback)
-        end
-    end
-
-    function window:SetHideCallback(callback)
-        if HideBtn then
-            HideBtn.MouseButton1Click:Connect(callback)
         end
     end
 
@@ -830,6 +1168,54 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         end
 
         return toggle
+    end
+
+    function window:CreateAntiSitButton(text, default, callback, position, size, colors, translationKey)
+        local btnPos = position
+        if btnPos then
+            btnPos = UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale)
+        end
+
+        local btnSize = size
+        if btnSize then
+            btnSize = UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale)
+        end
+
+        local antiSit = YUUGTRL:CreateAntiSitButton(self.Main, text, default, callback, btnPos, btnSize, colors)
+
+        if translationKey and antiSit and antiSit.button then
+            YUUGTRL:RegisterTranslatable(antiSit.button, translationKey)
+        end
+
+        if antiSit and antiSit.button then
+            table.insert(self.elements, {type = "anti-sit", obj = antiSit})
+        end
+
+        return antiSit
+    end
+
+    function window:CreateWalkFlingButton(text, default, callback, position, size, colors, translationKey)
+        local btnPos = position
+        if btnPos then
+            btnPos = UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale)
+        end
+
+        local btnSize = size
+        if btnSize then
+            btnSize = UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale)
+        end
+
+        local walkFling = YUUGTRL:CreateWalkFlingButton(self.Main, text, default, callback, btnPos, btnSize, colors)
+
+        if translationKey and walkFling and walkFling.button then
+            YUUGTRL:RegisterTranslatable(walkFling.button, translationKey)
+        end
+
+        if walkFling and walkFling.button then
+            table.insert(self.elements, {type = "walk-fling", obj = walkFling})
+        end
+
+        return walkFling
     end
 
     return window
@@ -883,7 +1269,7 @@ function YUUGTRL:CreateLabel(parent, text, position, size, color)
         BackgroundTransparency = 1,
         Text = text or "Label",
         TextColor3 = color or currentTheme.TextColor,
-        Font = Enum.Font.Gotham,
+        Font = Enum.Font.GothamBold,
         TextSize = 14 * scale,
         TextXAlignment = Enum.TextXAlignment.Left,
         Parent = parent
