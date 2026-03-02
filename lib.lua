@@ -221,6 +221,41 @@ local function IsEmojiOrSymbol(text)
     return string.find(text, emojiPattern) or string.find(text, symbolPattern)
 end
 
+function YUUGTRL:CreateTextButton(parent, text, callback, color, position, size)
+    if not parent then return end
+
+    local btn = Create({
+        type = "TextButton",
+        Size = size or UDim2.new(0, 100 * scale, 0, 25 * scale),
+        Position = position or UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        Text = text or "Button",
+        TextColor3 = color or currentTheme.TextColor,
+        Font = Enum.Font.Gotham,
+        TextSize = 14 * scale,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = parent
+    })
+
+    btn.MouseEnter:Connect(function()
+        if not IsEmojiOrSymbol(btn.Text) then
+            btn.TextColor3 = currentTheme.AccentColor
+        end
+    end)
+
+    btn.MouseLeave:Connect(function()
+        if not IsEmojiOrSymbol(btn.Text) then
+            btn.TextColor3 = color or currentTheme.TextColor
+        end
+    end)
+
+    if callback then
+        btn.MouseButton1Click:Connect(callback)
+    end
+
+    return btn
+end
+
 function YUUGTRL:CreateButton(parent, text, callback, color, position, size)
     if not parent then return end
 
@@ -492,452 +527,64 @@ function YUUGTRL:CreateButtonToggle(parent, text, default, callback, position, s
     return toggleObject
 end
 
-local antiSitInstances = {}
-local walkFlingInstances = {}
-
-function YUUGTRL:CreateAntiSitButton(parent, text, default, callback, position, size, colors)
+function YUUGTRL:CreateAutoScrollingFrame(parent, size, position, color, radius, autoScroll)
     if not parent then return end
+    
+    autoScroll = autoScroll ~= false
+    
+    local frame = Instance.new("ScrollingFrame")
+    frame.Size = size or UDim2.new(0, 200 * scale, 0, 200 * scale)
+    frame.Position = position or UDim2.new(0, 0, 0, 0)
+    frame.BackgroundColor3 = color or currentTheme.FrameColor
+    frame.BackgroundTransparency = 0
+    frame.BorderSizePixel = 0
+    frame.ScrollBarThickness = 4 * scale
+    frame.ScrollBarImageColor3 = currentTheme.ScrollBarColor
+    frame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    frame.AutomaticCanvasSize = autoScroll and Enum.AutomaticSize.Y or Enum.AutomaticSize.None
+    frame.Parent = parent
 
-    local antiSitEnabled = default or false
-    local antiSitConnection = nil
-
-    local colors = colors or {}
-    local buttonColor = colors.off or currentTheme.ButtonColor
-    if colors.on then
-        buttonColor = colors.on
+    if radius then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, radius or 12 * scale)
+        corner.Parent = frame
     end
 
-    local button = Instance.new("TextButton")
-    button.Size = size or UDim2.new(0, 140 * scale, 0, 40 * scale)
-    button.Position = position or UDim2.new(0, 0, 0, 0)
-    button.BackgroundColor3 = buttonColor
-    button.Text = text or "ANTI SIT"
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.GothamBold
-    button.TextSize = 14 * scale
-    button.Parent = parent
+    local layout = Instance.new("UIListLayout")
+    layout.Parent = frame
+    layout.Padding = UDim.new(0, 4)
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8 * scale)
-    corner.Parent = button
-
-    local gradient = Instance.new("UIGradient")
-    gradient.Rotation = 90
-    gradient.Parent = button
-
-    local brighter = Color3.fromRGB(
-        math.min(buttonColor.R * 255 + 200, 255),
-        math.min(buttonColor.G * 255 + 200, 255),
-        math.min(buttonColor.B * 255 + 200, 255)
-    )
-
-    local function updateGradient()
-        local grad = button:FindFirstChildOfClass("UIGradient")
-        if not grad then
-            grad = Instance.new("UIGradient")
-            grad.Rotation = 90
-            grad.Parent = button
-        end
-
-        local currentColor = buttonColor
-        local darkAmount = antiSitEnabled and 70 or 50
-        local darker2 = Color3.fromRGB(
-            math.max(currentColor.R * 255 - darkAmount, 0),
-            math.max(currentColor.G * 255 - darkAmount, 0),
-            math.max(currentColor.B * 255 - darkAmount, 0)
-        )
-
-        grad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, antiSitEnabled and darker2 or currentColor),
-            ColorSequenceKeypoint.new(1, darker2)
-        })
-
-        if not IsEmojiOrSymbol(button.Text) then
-            if antiSitEnabled then
-                button.TextColor3 = Color3.fromRGB(
-                    math.min(currentColor.R * 255 + 230, 255),
-                    math.min(currentColor.G * 255 + 230, 255),
-                    math.min(currentColor.B * 255 + 230, 255)
-                )
-            else
-                button.TextColor3 = brighter
-            end
-        end
-    end
-
-    local function updateCharacter()
-        local char = player.Character
-        if char and char:FindFirstChild("Humanoid") then
-            return char.Humanoid
-        end
-        return nil
-    end
-
-    local function startAntiSit()
-        local humanoid = updateCharacter()
-        if humanoid then
-            humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-        end
-
-        if antiSitConnection then antiSitConnection:Disconnect() end
-        antiSitConnection = RunService.Heartbeat:Connect(function()
-            local char = player.Character
-            if char and char:FindFirstChild("Humanoid") then
-                local hum = char.Humanoid
-                if hum:GetState() == Enum.HumanoidStateType.Seated then
-                    hum:ChangeState(Enum.HumanoidStateType.Running)
+    if not autoScroll then
+        local function updateCanvasSize()
+            local contentHeight = 0
+            for _, child in pairs(frame:GetChildren()) do
+                if child:IsA("GuiObject") and child ~= layout then
+                    contentHeight = contentHeight + child.AbsoluteSize.Y + layout.Padding.Offset
                 end
             end
+            frame.CanvasSize = UDim2.new(0, 0, 0, contentHeight)
+        end
+
+        layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            frame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y)
         end)
-    end
 
-    local function stopAntiSit()
-        if antiSitConnection then
-            antiSitConnection:Disconnect()
-            antiSitConnection = nil
-        end
-        local humanoid = updateCharacter()
-        if humanoid then
-            humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
-        end
-    end
-
-    updateGradient()
-
-    button.MouseEnter:Connect(function()
-        local currentColor = buttonColor
-        local hoverColor = Color3.fromRGB(
-            math.min(currentColor.R * 255 + 30, 255),
-            math.min(currentColor.G * 255 + 30, 255),
-            math.min(currentColor.B * 255 + 30, 255)
-        )
-        local hoverDarker = Color3.fromRGB(
-            math.max(hoverColor.R * 255 - 50, 0),
-            math.max(hoverColor.G * 255 - 50, 0),
-            math.max(hoverColor.B * 255 - 50, 0)
-        )
-
-        local grad = button:FindFirstChildOfClass("UIGradient")
-        if grad then
-            grad.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, hoverColor),
-                ColorSequenceKeypoint.new(1, hoverDarker)
-            })
-        end
-
-        if not IsEmojiOrSymbol(button.Text) then
-            button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        end
-    end)
-
-    button.MouseLeave:Connect(function()
-        updateGradient()
-    end)
-
-    button.MouseButton1Click:Connect(function()
-        antiSitEnabled = not antiSitEnabled
-        if antiSitEnabled then
-            startAntiSit()
-        else
-            stopAntiSit()
-        end
-        updateGradient()
-        if callback then
-            pcall(callback, antiSitEnabled)
-        end
-    end)
-
-    player.CharacterAdded:Connect(function()
-        if antiSitEnabled then
-            task.wait(0.5)
-            local char = player.Character
-            if char and char:FindFirstChild("Humanoid") then
-                char.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-            end
-        end
-    end)
-
-    local antiSitObject = {}
-
-    function antiSitObject:SetState(state)
-        antiSitEnabled = state
-        if antiSitEnabled then
-            startAntiSit()
-        else
-            stopAntiSit()
-        end
-        updateGradient()
-        if callback then pcall(callback, antiSitEnabled) end
-    end
-
-    function antiSitObject:GetState()
-        return antiSitEnabled
-    end
-
-    function antiSitObject:Toggle()
-        antiSitEnabled = not antiSitEnabled
-        if antiSitEnabled then
-            startAntiSit()
-        else
-            stopAntiSit()
-        end
-        updateGradient()
-        if callback then pcall(callback, antiSitEnabled) end
-    end
-
-    function antiSitObject:SetText(newText)
-        button.Text = newText
-    end
-
-    function antiSitObject:SetColors(newColors)
-        if newColors.on then buttonColor = newColors.on end
-        if newColors.off then buttonColor = newColors.off end
-        updateGradient()
-    end
-
-    function antiSitObject:Destroy()
-        if antiSitConnection then antiSitConnection:Disconnect() end
-        button:Destroy()
-    end
-
-    antiSitObject.button = button
-    table.insert(antiSitInstances, antiSitObject)
-
-    return antiSitObject
-end
-
-function YUUGTRL:CreateWalkFlingButton(parent, text, default, callback, position, size, colors)
-    if not parent then return end
-
-    local walkFlingEnabled = default or false
-    local walkFlingConnection = nil
-    local jumpConnection = nil
-    local character = nil
-    local root = nil
-    local humanoid = nil
-
-    local colors = colors or {}
-    local buttonColor = colors.off or currentTheme.ButtonColor
-    if colors.on then
-        buttonColor = colors.on
-    end
-
-    local button = Instance.new("TextButton")
-    button.Size = size or UDim2.new(0, 140 * scale, 0, 40 * scale)
-    button.Position = position or UDim2.new(0, 0, 0, 0)
-    button.BackgroundColor3 = buttonColor
-    button.Text = text or "WALK FLING"
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.GothamBold
-    button.TextSize = 14 * scale
-    button.Parent = parent
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8 * scale)
-    corner.Parent = button
-
-    local gradient = Instance.new("UIGradient")
-    gradient.Rotation = 90
-    gradient.Parent = button
-
-    local brighter = Color3.fromRGB(
-        math.min(buttonColor.R * 255 + 200, 255),
-        math.min(buttonColor.G * 255 + 200, 255),
-        math.min(buttonColor.B * 255 + 200, 255)
-    )
-
-    local function updateCharacter()
-        character = player.Character
-        if character then
-            root = character:FindFirstChild("HumanoidRootPart")
-            humanoid = character:FindFirstChild("Humanoid")
-        end
-    end
-
-    local function startWalkFling()
-        updateCharacter()
-        if not character or not root or not humanoid then return end
-
-        root.CanCollide = false
-        humanoid:ChangeState(11)
-
-        if jumpConnection then jumpConnection:Disconnect() end
-        jumpConnection = UserInputService.JumpRequest:Connect(function()
-            if humanoid and humanoid.Health > 0 then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        frame.ChildAdded:Connect(function(child)
+            if child:IsA("GuiObject") then
+                task.wait()
+                updateCanvasSize()
             end
         end)
 
-        if walkFlingConnection then walkFlingConnection:Disconnect() end
-
-        walkFlingConnection = RunService.Heartbeat:Connect(function()
-            if not walkFlingEnabled or not root or not humanoid then return end
-            if humanoid.Health <= 0 then 
-                walkFlingEnabled = false 
-                updateGradient()
-                return 
-            end
-
-            local vel = root.Velocity
-            root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
-            RunService.RenderStepped:Wait()
-            if root then root.Velocity = vel end
-            RunService.Stepped:Wait()
-            if root then root.Velocity = vel + Vector3.new(0, 0.1, 0) end
+        frame.ChildRemoved:Connect(function()
+            task.wait()
+            updateCanvasSize()
         end)
     end
 
-    local function stopWalkFling()
-        if walkFlingConnection then 
-            walkFlingConnection:Disconnect() 
-            walkFlingConnection = nil 
-        end
-        if jumpConnection then 
-            jumpConnection:Disconnect() 
-            jumpConnection = nil 
-        end
-        if root then root.CanCollide = true end
-        if humanoid then humanoid:ChangeState(Enum.HumanoidStateType.Running) end
-    end
-
-    local function updateGradient()
-        local grad = button:FindFirstChildOfClass("UIGradient")
-        if not grad then
-            grad = Instance.new("UIGradient")
-            grad.Rotation = 90
-            grad.Parent = button
-        end
-
-        local currentColor = buttonColor
-        local darkAmount = walkFlingEnabled and 70 or 50
-        local darker2 = Color3.fromRGB(
-            math.max(currentColor.R * 255 - darkAmount, 0),
-            math.max(currentColor.G * 255 - darkAmount, 0),
-            math.max(currentColor.B * 255 - darkAmount, 0)
-        )
-
-        grad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, walkFlingEnabled and darker2 or currentColor),
-            ColorSequenceKeypoint.new(1, darker2)
-        })
-
-        if not IsEmojiOrSymbol(button.Text) then
-            if walkFlingEnabled then
-                button.TextColor3 = Color3.fromRGB(
-                    math.min(currentColor.R * 255 + 230, 255),
-                    math.min(currentColor.G * 255 + 230, 255),
-                    math.min(currentColor.B * 255 + 230, 255)
-                )
-            else
-                button.TextColor3 = brighter
-            end
-        end
-    end
-
-    updateGradient()
-
-    button.MouseEnter:Connect(function()
-        local currentColor = buttonColor
-        local hoverColor = Color3.fromRGB(
-            math.min(currentColor.R * 255 + 30, 255),
-            math.min(currentColor.G * 255 + 30, 255),
-            math.min(currentColor.B * 255 + 30, 255)
-        )
-        local hoverDarker = Color3.fromRGB(
-            math.max(hoverColor.R * 255 - 50, 0),
-            math.max(hoverColor.G * 255 - 50, 0),
-            math.max(hoverColor.B * 255 - 50, 0)
-        )
-
-        local grad = button:FindFirstChildOfClass("UIGradient")
-        if grad then
-            grad.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, hoverColor),
-                ColorSequenceKeypoint.new(1, hoverDarker)
-            })
-        end
-
-        if not IsEmojiOrSymbol(button.Text) then
-            button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        end
-    end)
-
-    button.MouseLeave:Connect(function()
-        updateGradient()
-    end)
-
-    button.MouseButton1Click:Connect(function()
-        walkFlingEnabled = not walkFlingEnabled
-        if walkFlingEnabled then
-            startWalkFling()
-        else
-            stopWalkFling()
-        end
-        updateGradient()
-        if callback then
-            pcall(callback, walkFlingEnabled)
-        end
-    end)
-
-    player.CharacterAdded:Connect(function(newChar)
-        character = newChar
-        task.wait(0.5)
-        root = character:FindFirstChild("HumanoidRootPart")
-        humanoid = character:FindFirstChild("Humanoid")
-        if walkFlingEnabled and root and humanoid then
-            root.CanCollide = false
-            humanoid:ChangeState(11)
-        end
-    end)
-
-    local walkFlingObject = {}
-
-    function walkFlingObject:SetState(state)
-        walkFlingEnabled = state
-        if walkFlingEnabled then
-            startWalkFling()
-        else
-            stopWalkFling()
-        end
-        updateGradient()
-        if callback then pcall(callback, walkFlingEnabled) end
-    end
-
-    function walkFlingObject:GetState()
-        return walkFlingEnabled
-    end
-
-    function walkFlingObject:Toggle()
-        walkFlingEnabled = not walkFlingEnabled
-        if walkFlingEnabled then
-            startWalkFling()
-        else
-            stopWalkFling()
-        end
-        updateGradient()
-        if callback then pcall(callback, walkFlingEnabled) end
-    end
-
-    function walkFlingObject:SetText(newText)
-        button.Text = newText
-    end
-
-    function walkFlingObject:SetColors(newColors)
-        if newColors.on then buttonColor = newColors.on end
-        if newColors.off then buttonColor = newColors.off end
-        updateGradient()
-    end
-
-    function walkFlingObject:Destroy()
-        if walkFlingConnection then walkFlingConnection:Disconnect() end
-        if jumpConnection then jumpConnection:Disconnect() end
-        button:Destroy()
-    end
-
-    walkFlingObject.button = button
-    table.insert(walkFlingInstances, walkFlingObject)
-
-    return walkFlingObject
+    return frame
 end
 
 function YUUGTRL:CreateWindow(title, size, position, options)
@@ -1090,10 +737,10 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return YUUGTRL:CreateFrame(self.Main, frameSize, framePos, color, radius and radius * self.scale)
     end
 
-    function window:CreateScrollingFrame(size, position, color, radius)
+    function window:CreateAutoScrollingFrame(size, position, color, radius, autoScroll)
         local frameSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
         local framePos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
-        return YUUGTRL:CreateScrollingFrame(self.Main, frameSize, framePos, color, radius and radius * self.scale)
+        return YUUGTRL:CreateAutoScrollingFrame(self.Main, frameSize, framePos, color, radius and radius * self.scale, autoScroll)
     end
 
     function window:CreateLabel(text, position, size, color, translationKey)
@@ -1117,6 +764,18 @@ function YUUGTRL:CreateWindow(title, size, position, options)
             YUUGTRL:RegisterTranslatable(btn, translationKey)
         end
         table.insert(self.elements, {type = "button", obj = btn})
+        return btn
+    end
+
+    function window:CreateTextButton(text, callback, color, position, size, translationKey)
+        local btnPos = position and UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale) or nil
+        local btnSize = size and UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale) or nil
+        local btn = YUUGTRL:CreateTextButton(self.Main, text, callback, color, btnPos, btnSize)
+        btn.TextSize = btn.TextSize * self.scale
+        if translationKey then
+            YUUGTRL:RegisterTranslatable(btn, translationKey)
+        end
+        table.insert(self.elements, {type = "textbutton", obj = btn})
         return btn
     end
 
@@ -1170,54 +829,6 @@ function YUUGTRL:CreateWindow(title, size, position, options)
         return toggle
     end
 
-    function window:CreateAntiSitButton(text, default, callback, position, size, colors, translationKey)
-        local btnPos = position
-        if btnPos then
-            btnPos = UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale)
-        end
-
-        local btnSize = size
-        if btnSize then
-            btnSize = UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale)
-        end
-
-        local antiSit = YUUGTRL:CreateAntiSitButton(self.Main, text, default, callback, btnPos, btnSize, colors)
-
-        if translationKey and antiSit and antiSit.button then
-            YUUGTRL:RegisterTranslatable(antiSit.button, translationKey)
-        end
-
-        if antiSit and antiSit.button then
-            table.insert(self.elements, {type = "anti-sit", obj = antiSit})
-        end
-
-        return antiSit
-    end
-
-    function window:CreateWalkFlingButton(text, default, callback, position, size, colors, translationKey)
-        local btnPos = position
-        if btnPos then
-            btnPos = UDim2.new(position.X.Scale, position.X.Offset * self.scale, position.Y.Scale, position.Y.Offset * self.scale)
-        end
-
-        local btnSize = size
-        if btnSize then
-            btnSize = UDim2.new(size.X.Scale, size.X.Offset * self.scale, size.Y.Scale, size.Y.Offset * self.scale)
-        end
-
-        local walkFling = YUUGTRL:CreateWalkFlingButton(self.Main, text, default, callback, btnPos, btnSize, colors)
-
-        if translationKey and walkFling and walkFling.button then
-            YUUGTRL:RegisterTranslatable(walkFling.button, translationKey)
-        end
-
-        if walkFling and walkFling.button then
-            table.insert(self.elements, {type = "walk-fling", obj = walkFling})
-        end
-
-        return walkFling
-    end
-
     return window
 end
 
@@ -1237,29 +848,6 @@ function YUUGTRL:CreateFrame(parent, size, position, color, radius)
     return frame
 end
 
-function YUUGTRL:CreateScrollingFrame(parent, size, position, color, radius)
-    if not parent then return end
-    local frame = Instance.new("ScrollingFrame")
-    frame.Size = size or UDim2.new(0, 200 * scale, 0, 200 * scale)
-    frame.Position = position or UDim2.new(0, 0, 0, 0)
-    frame.BackgroundColor3 = color or currentTheme.FrameColor
-    frame.BackgroundTransparency = 0
-    frame.BorderSizePixel = 0
-    frame.ScrollBarThickness = 4 * scale
-    frame.ScrollBarImageColor3 = currentTheme.ScrollBarColor
-    frame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    frame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    frame.Parent = parent
-
-    if radius then
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, radius or 12 * scale)
-        corner.Parent = frame
-    end
-
-    return frame
-end
-
 function YUUGTRL:CreateLabel(parent, text, position, size, color)
     if not parent then return end
     return Create({
@@ -1269,7 +857,7 @@ function YUUGTRL:CreateLabel(parent, text, position, size, color)
         BackgroundTransparency = 1,
         Text = text or "Label",
         TextColor3 = color or currentTheme.TextColor,
-        Font = Enum.Font.GothamBold,
+        Font = Enum.Font.Gotham,
         TextSize = 14 * scale,
         TextXAlignment = Enum.TextXAlignment.Left,
         Parent = parent
